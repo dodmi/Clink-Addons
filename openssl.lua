@@ -338,8 +338,35 @@ local openssl_parser = parser({
 		"-help"
 		),
 	"req" .. parser({}, -- empty {}: don't suggest any positional args
-		"-help"
-		),
+		"-help", "-pubkey", "-new", "-batch", "-newhdr", "-modulus",
+		"-verify", "-nodes", "-noout", "-verbose", "-utf8", "-text",
+		"-x509", "-subject", "-multivalue-rdn", "-precert", "-*",
+		"-key",				-- Parameter Private key to use
+		"-keyform",			-- Parameter Key file format
+		"-passin",			-- Parameter Private key password source
+		"-passout",			-- Parameter Output file pass phrase source
+		"-newkey",			-- Parameter Specify as type:bits
+		"-pkeyopt",			-- Parameter Public key options as opt:value
+		"-sigopt",			-- Parameter Signature parameter in n:v form
+		"-nameopt",			-- Parameter Various certificate name options
+		"-reqopt",			-- Parameter Various request text options
+		"-subj",			-- Parameter Set or modify request subject
+		"-days",			-- Parameter Number of days cert is valid for
+		"-set_serial",		-- Parameter Serial number to use
+		"-addext",			-- Parameter Additional cert extension key=value pair (may be given more than once)
+		"-extensions",		-- Parameter Cert extension section (override value in config file)
+		"-reqexts",			-- Parameter Request extension section (override value in config file)
+		"-engine",			-- Parameter Use engine, possibly a hardware device
+		"-keygen_engine",	-- Parameter Specify engine to be used for key generation operations
+		"-inform" .. parser({"PEM", "DER"}),
+ 		"-outform" .. parser({"PEM", "DER"}),
+		"-in" .. parser{clink.filematches}, 		-- Parameter Input file
+		"-out" .. parser{clink.filematches}, 		-- Parameter Output file
+		"-config" .. parser{clink.filematches}, 	-- Parameter Request template file
+		"-keyout" .. parser{clink.filematches}, 	-- Parameter File to send the key to
+		"-rand" .. parser{clink.filematches}, 		-- Parameter Load the file(s) into the random number generator
+		"-writerand" .. parser{clink.filematches} 	-- Parameter Write random data to the specified file
+	),
 	"rsa" .. parser({}, -- empty {}: don't suggest any positional args
 		"-help"
 		),
@@ -347,8 +374,107 @@ local openssl_parser = parser({
 		"-help"
 		),
 	"s_client" .. parser({}, -- empty {}: don't suggest any positional args
-		"-help"
-		),
+		"-help","-4", "-6", "-no-CAfile", "-no-CApath", "-dane_ee_no_namechecks",
+		"-reconnect", "-showcerts", "-debug", "-msg", "-msgfile outfile",
+		"-nbio_test", "-state", "-crlf", "-quiet", "-ign_eof", "-no_ign_eof",
+		"-fallback_scsv", "-crl_download", "-verify_return_error", "-verify_quiet",
+		"-brief", "-prexit", "-security_debug", "-security_debug_verbose",
+		"-build_chain", "-nocommands", "-noservername", "-tlsextdebug", "-status",
+		"-async", "-no_ssl3", "-no_tls1", "-no_tls1_1", "-no_tls1_2", "-no_tls1_3",
+		"-bugs", "-no_comp", "-comp", "-no_ticket", "-serverpref",
+		"-legacy_renegotiation", "-no_renegotiation", "-legacy_server_connect",
+		"-no_resumption_on_reneg", "-no_legacy_server_connect", "-allow_no_dhe_kex",
+		"-prioritize_chacha", "-strict", "-debug_broken_protocol", "-no_middlebox",
+		"-ignore_critical", "-issuer_checks", "-crl_check", "-crl_check_all",
+		"-policy_check", "-explicit_policy", "-inhibit_any", "-inhibit_map",
+		"-x509_strict", "-extended_crl", "-use_deltas", "-policy_print",
+		"-check_ss_sig", "-trusted_first", "-suiteB_128_only", "-suiteB_128",
+		"-suiteB_192", "-partial_chain", "-no_alt_chains", "-no_check_time",
+		"-allow_proxy_certs", "-xchain_build", "-tls1", "-tls1_1", "-tls1_2",
+		"-tls1_3", "-dtls", "-timeout", "-dtls1", "-dtls1_2", "-nbio", "-srp_lateuser",
+		"-srp_moregroups", "-ct", "-noct", "-enable_pha",
+		"-host",				-- Parameter Use -connect instead
+		"-port",				-- Parameter Use -connect instead
+		"-connect",				-- Parameter TCP/IP where to connect (default is :4433)
+		"-bind",				-- Parameter bind local address for connection
+		"-proxy",				-- Parameter Connect to via specified proxy to the real server
+		"-unix",				-- Parameter Connect over the specified Unix-domain socket
+		"-verify",				-- Parameter Turn on peer certificate verification
+		"-nameopt",				-- Parameter Various certificate name options
+		"-pass",				-- Parameter Private key file pass phrase source
+		"-dane_tlsa_domain",	-- Parameter DANE TLSA base domain
+		"-dane_tlsa_rrdata",	-- Parameter DANE TLSA rrdata presentation form
+		"-starttls",			-- Parameter Use the appropriate STARTTLS command before starting TLS
+		"-xmpphost",			-- Parameter Alias of -name option for "-starttls xmpp[-server]"
+		"-use_srtp",			-- Parameter Offer SRTP key management with a colon-separated profile list
+		"-keymatexport",		-- Parameter Export keying material using label
+		"-keymatexportlen",		-- Parameter Export len bytes of keying material (default 20)
+		"-name",				-- Parameter Hostname for "-starttls lmtp", "-starttls smtp" or "-starttls xmpp[-server]"
+		"-servername",			-- Parameter Set TLS extension servername (SNI) in ClientHello (default)
+		"-serverinfo",			-- Parameter types  Send empty ClientHello extensions (comma-separated numbers)
+		"-alpn",				-- Parameter Enable ALPN extension (comma-separated list)
+		"-max_send_frag",		-- Parameter Maximum Size of send frames
+		"-split_send_frag",		-- Parameter Size used to split data for encrypt pipelines
+		"-max_pipelines",		-- Parameter Maximum number of encrypt/decrypt pipelines to be used
+		"-read_buf",			-- Parameter Default read buffer size to be used for connections
+		"-sigalgs",				-- Parameter Signature algorithms to support (colon-separated list)
+		"-client_sigalgs",		-- Parameter Signature algorithms to support for client cert auth (colon-separated list)
+		"-groups",				-- Parameter Groups to advertise (colon-separated list)
+		"-curves",				-- Parameter Groups to advertise (colon-separated list)
+		"-named_curve",			-- Parameter Elliptic curve used for ECDHE (server-side only)
+		"-cipher",				-- Parameter Specify TLSv1.2 and below cipher list to be used
+		"-ciphersuites",		-- Parameter Specify TLSv1.3 ciphersuites to be used
+		"-min_protocol",		-- Parameter Specify the minimum protocol version to be used
+		"-max_protocol",		-- Parameter Specify the maximum protocol version to be used
+		"-record_padding",		-- Parameter Block size to pad TLS 1.3 records to.
+		"-policy",				-- Parameter adds policy to the acceptable policy set
+		"-purpose",				-- Parameter certificate chain purpose
+		"-verify_name",			-- Parameter verification policy name
+		"-verify_depth",		-- Parameter chain depth limit
+		"-auth_level",			-- Parameter chain authentication security level
+		"-attime",				-- Parameter verification epoch time
+		"-verify_hostname",		-- Parameter expected peer hostname
+		"-verify_email",		-- Parameter expected peer email
+		"-verify_ip",			-- Parameter expected peer IP address
+		"-mtu",					-- Parameter Set the link layer MTU
+		"-psk_identity",		-- Parameter PSK identity
+		"-psk",					-- Parameter PSK in hex (without 0x)
+		"-srpuser",				-- Parameter SRP authentication for 'user'
+		"-srppass",				-- Parameter Password for 'user'
+		"-srp_strength",		-- Parameter Minimal length in bits for N
+		"-nextprotoneg",		-- Parameter Enable NPN extension (comma-separated list)
+		"-engine",				-- Parameter Use engine, possibly a hardware device
+		"-ssl_client_engine",	-- Parameter Specify engine to be used for client certificate operations
+		"-certform" .. parser({"PEM", "DER"}),
+		"-keyform" .. parser({"PEM", "DER", "ENGINE"}),
+		"-CRLform" .. parser({"PEM", "DER"}),
+		"-xcertform" .. parser({"PEM", "DER"}),
+		"-xkeyform" .. parser({"PEM", "DER"}),
+		"-maxfraglen" .. parser({"512", "1024", "2048", "4096"}),
+		"-cert" .. parser{clink.filematches}, 			-- Parameter Certificate file to use, PEM format assumed
+		"-key" .. parser{clink.filematches}, 			-- Parameter Private key file to use, if not in -cert file
+		"-CAfile" .. parser{clink.filematches}, 		-- Parameter PEM format file of CA's
+		"-requestCAfile" .. parser{clink.filematches}, 	-- Parameter PEM format file of CA names to send to the server
+		"-rand" .. parser{clink.filematches}, 			-- Parameter Load the file(s) into the random number generator
+		"-writerand" .. parser{clink.filematches}, 		-- Parameter Write random data to the specified file
+		"-sess_out" .. parser{clink.filematches}, 		-- Parameter File to write SSL session to
+		"-sess_in" .. parser{clink.filematches}, 		-- Parameter File to read SSL session from
+		"-CRL" .. parser{clink.filematches}, 			-- Parameter CRL file to use
+		"-cert_chain" .. parser{clink.filematches}, 	-- Parameter Certificate chain file (in PEM format)
+		"-chainCAfile" .. parser{clink.filematches}, 	-- Parameter CA file for certificate chain (PEM format)
+		"-verifyCAfile" .. parser{clink.filematches}, 	-- Parameter CA file for certificate verification (PEM format)
+		"-ssl_config" .. parser{clink.filematches}, 	-- Parameter Use specified configuration file
+		"-xkey" .. parser{clink.filematches}, 			-- Parameter key for Extended certificates
+		"-xcert" .. parser{clink.filematches}, 			-- Parameter cert for Extended certificates
+		"-xchain" .. parser{clink.filematches}, 		-- Parameter chain for Extended certificates
+		"-psk_session" .. parser{clink.filematches},	-- Parameter File to read PSK SSL session from
+		"-ctlogfile" .. parser{clink.filematches}, 		-- Parameter CT log list CONF file
+		"-keylogfile" .. parser{clink.filematches}, 	-- Parameter Write TLS secrets to file
+		"-early_data" .. parser{clink.filematches}, 	-- Parameter File to send as early data
+		"-CApath" .. parser{clink.filematches}, 		-- Parameter PEM format directory of CA's
+		"-chainCApath" .. parser{clink.filematches}, 	-- Parameter Use dir as cert store path to build CA certificate chain
+		"-verifyCApath" .. parser{clink.filematches} 	-- Parameter Use dir as cert store path to verify CA certificate
+	),
 	"s_server" .. parser({}, -- empty {}: don't suggest any positional args
 		"-help"
 		),
