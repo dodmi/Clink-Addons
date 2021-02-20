@@ -10,7 +10,7 @@ How to use this file?
 - Now you should have tab completion for openssl parameters
 
 Where do I get the latest version?
-https://github.com/dodmi/Clink/tree/master/
+https://github.com/dodmi/Clink-Addons/tree/master/
 
 When was this file updated?
 2021-02-19
