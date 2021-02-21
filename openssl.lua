@@ -13,7 +13,7 @@ Where do I get the latest version?
 https://github.com/dodmi/Clink-Addons/tree/master/
 
 When was this file updated?
-2021-02-19
+2021-02-21
 
 ]]--
 
@@ -509,8 +509,45 @@ local openssl_parser = parser({
 		"-help", "-a", "-b", "-d", "-e", "-f", "-o", "-p", "-r", "-v"
 	),
 	"x509" .. parser({}, -- empty {}: don't suggest any positional args
-		"-help"
-		)
+		"-help", "-serial", "-subject_hash", "-issuer_hash", "-hash", 
+		"-subject", "-issuer", "-email", "-startdate", "-enddate", 
+		"-purpose", "-dates", "-modulus", "-pubkey", "-fingerprint", 
+		"-alias", "-noout", "-nocert", "-ocspid", "-ocsp_uri", "-trustout", 
+		"-clrtrust", "-clrext", "-x509toreq", "-req", "-CAcreateserial", 
+		"-text", "-C", "-next_serial", "-clrreject", "-badsig", "-*", 
+		"-subject_hash_old", "-issuer_hash_old", "-preserve_dates", 
+		"-passin",		-- Parameter Private key password/pass-phrase source
+		"-addtrust",	-- Parameter Trust certificate for a given purpose
+		"-addreject",	-- Parameter Reject certificate for a given purpose
+		"-setalias",	-- Parameter Set certificate alias
+		"-days",		-- Parameter How long till expiry of a signed certificate - def 30 days
+		"-checkend",	-- Parameter Check whether the cert expires in the next n seconds, exit code 1 or 0
+		"-signkey",		-- Parameter Self sign cert with arg
+		"-set_serial",	-- Parameter Serial number to use
+		"-ext",			-- Parameter Print various X509V3 extensions
+		"-extensions",	-- Parameter Section from config file to use
+		"-nameopt",		-- Parameter Various certificate name options
+		"-certopt",		-- Parameter Various certificate text options
+		"-checkhost",	-- Parameter Check certificate matches host
+		"-checkemail",	-- Parameter Check certificate matches email
+		"-checkip",		-- Parameter Check certificate matches ipaddr
+		"-sigopt",		-- Parameter Signature parameter in n:v form
+		"-engine",		-- Parameter Use engine, possibly a hardware device		
+		"-inform" .. parser({"PEM", "DER"}),
+		"-outform" .. parser({"PEM", "DER"}),
+		"-keyform" .. parser({"PEM", "DER", "ENGINE"}),
+		"-CAform" .. parser({"PEM", "DER"}),
+		"-CAkeyform" .. parser({"PEM", "DER", "ENGINE"}),
+		"-in" .. parser{clink.filematches}, 		-- Parameter Input file - default stdin
+		"-out" .. parser{clink.filematches}, 		-- Parameter Output file - default stdout
+		"-CA" .. parser{clink.filematches}, 		-- Parameter Set the CA certificate, must be PEM format
+		"-CAkey" .. parser{clink.filematches}, 		-- Parameter The CA key as PEM; if not in CAfile
+		"-CAserial" .. parser{clink.filematches}, 	-- Parameter Serial file
+		"-extfile" .. parser{clink.filematches}, 	-- Parameter File with X509V3 extensions to add
+		"-rand" .. parser{clink.filematches}, 		-- Parameter Load the file(s) into random number generator
+		"-writerand" .. parser{clink.filematches}, 	-- Parameter Write random data to the specified file
+		"-force_pubkey" .. parser{clink.filematches} -- Parameter Force the Key to put inside certificate
+	)
 })
 
 clink.arg.register_parser("openssl", openssl_parser)
