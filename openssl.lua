@@ -330,7 +330,7 @@ local openssl_parser = parser({
 		"-in" .. parser{clink.filematches}, 		-- Parameter Input filename
 		"-out" .. parser{clink.filematches}, 		-- Parameter Output filename
 		"-CAfile" .. parser{clink.filematches}, 	-- Parameter PEM-format file of CA's
-		"-CApath" .. parser{clink.dirmatches}, 		-- Parameter PEM-format directory of CA's
+		"-CApath" .. parser{clink.dirmatches} 		-- Parameter PEM-format directory of CA's
 	),
 	"pkcs7" .. parser({}, -- empty {}: don't suggest any positional args
 		"-help", "-noout", "-text", "-print", "-print_certs",  
@@ -338,7 +338,7 @@ local openssl_parser = parser({
 		"-inform" .. parser({"PEM", "DER"}),
 		"-outform" .. parser({"PEM", "DER"}),
 		"-in" .. parser{clink.filematches}, 	-- Parameter Input file
-		"-out" .. parser{clink.filematches}, 	-- Parameter Output file
+		"-out" .. parser{clink.filematches} 	-- Parameter Output file
 	),
 	"pkcs8" .. parser({}, -- empty {}: don't suggest any positional args
 		"-help"
