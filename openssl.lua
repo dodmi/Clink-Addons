@@ -13,7 +13,7 @@ Where do I get the latest version?
 https://github.com/dodmi/Clink-Addons/tree/master/
 
 When was this file updated?
-2021-02-21
+2021-02-22
 
 ]]--
 
@@ -311,11 +311,35 @@ local openssl_parser = parser({
 		"-help"
 		),
 	"pkcs12" .. parser({}, -- empty {}: don't suggest any positional args
-		"-help"
-		),
+		"-help", "-nokeys", "-keyex", "-keysig", "-nocerts", "-clcerts",
+		"-cacerts", "-noout", "-info", "-chain", "-twopass", "-nomacver", "-descert", "-export", "-noiter",  "-maciter", "-nomaciter", "-nomac", "-LMK", "-nodes", "-no-CAfile", "-no-CApath", "-*",
+		"-certpbe",	-- Parameter Certificate PBE algorithm (default RC2-40)
+		"-macalg",	-- Parameter Digest algorithm used in MAC (default SHA1)
+		"-keypbe",	-- Parameter Private key PBE algorithm (default 3DES)
+		"-inkey",	-- Parameter Private key if not infile
+		"-name",	-- Parameter Use name as friendly name
+		"-CSP",		-- Parameter Microsoft CSP name
+		"-caname",	-- Parameter Use name as CA friendly name (can be repeated)
+		"-passin",	-- Parameter Input file pass phrase source
+		"-passout",	-- Parameter Output file pass phrase source
+		"-password",-- Parameter Set import/export password source
+		"-engine",	-- Parameter Use engine, possibly a hardware device
+		"-rand" .. parser{clink.filematches}, 		-- Parameter Load the file(s) into random number generator
+		"-writerand" .. parser{clink.filematches}, 	-- Parameter Write random data to the specified file
+		"-certfile" .. parser{clink.filematches}, 	-- Parameter Load certs from file
+		"-in" .. parser{clink.filematches}, 		-- Parameter Input filename
+		"-out" .. parser{clink.filematches}, 		-- Parameter Output filename
+		"-CAfile" .. parser{clink.filematches}, 	-- Parameter PEM-format file of CA's
+		"-CApath" .. parser{clink.dirmatches}, 		-- Parameter PEM-format directory of CA's
+	),
 	"pkcs7" .. parser({}, -- empty {}: don't suggest any positional args
-		"-help"
-		),
+		"-help", "-noout", "-text", "-print", "-print_certs",  
+		"-engine",	-- Parameter Use engine, possibly a hardware device
+		"-inform" .. parser({"PEM", "DER"}),
+		"-outform" .. parser({"PEM", "DER"}),
+		"-in" .. parser{clink.filematches}, 	-- Parameter Input file
+		"-out" .. parser{clink.filematches}, 	-- Parameter Output file
+	),
 	"pkcs8" .. parser({}, -- empty {}: don't suggest any positional args
 		"-help"
 		),
@@ -509,13 +533,13 @@ local openssl_parser = parser({
 		"-help", "-a", "-b", "-d", "-e", "-f", "-o", "-p", "-r", "-v"
 	),
 	"x509" .. parser({}, -- empty {}: don't suggest any positional args
-		"-help", "-serial", "-subject_hash", "-issuer_hash", "-hash", 
-		"-subject", "-issuer", "-email", "-startdate", "-enddate", 
-		"-purpose", "-dates", "-modulus", "-pubkey", "-fingerprint", 
-		"-alias", "-noout", "-nocert", "-ocspid", "-ocsp_uri", "-trustout", 
-		"-clrtrust", "-clrext", "-x509toreq", "-req", "-CAcreateserial", 
-		"-text", "-C", "-next_serial", "-clrreject", "-badsig", "-*", 
-		"-subject_hash_old", "-issuer_hash_old", "-preserve_dates", 
+		"-help", "-serial", "-subject_hash", "-issuer_hash", "-hash",
+		"-subject", "-issuer", "-email", "-startdate", "-enddate",
+		"-purpose", "-dates", "-modulus", "-pubkey", "-fingerprint",
+		"-alias", "-noout", "-nocert", "-ocspid", "-ocsp_uri", "-trustout",
+		"-clrtrust", "-clrext", "-x509toreq", "-req", "-CAcreateserial",
+		"-text", "-C", "-next_serial", "-clrreject", "-badsig", "-*",
+		"-subject_hash_old", "-issuer_hash_old", "-preserve_dates",
 		"-passin",		-- Parameter Private key password/pass-phrase source
 		"-addtrust",	-- Parameter Trust certificate for a given purpose
 		"-addreject",	-- Parameter Reject certificate for a given purpose
@@ -532,7 +556,7 @@ local openssl_parser = parser({
 		"-checkemail",	-- Parameter Check certificate matches email
 		"-checkip",		-- Parameter Check certificate matches ipaddr
 		"-sigopt",		-- Parameter Signature parameter in n:v form
-		"-engine",		-- Parameter Use engine, possibly a hardware device		
+		"-engine",		-- Parameter Use engine, possibly a hardware device
 		"-inform" .. parser({"PEM", "DER"}),
 		"-outform" .. parser({"PEM", "DER"}),
 		"-keyform" .. parser({"PEM", "DER", "ENGINE"}),

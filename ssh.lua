@@ -31,7 +31,8 @@ local function readFile(filename)
     return lines
 end
 
--- read all host entries in the user's ssh config file, omit definitions containing ? or *
+-- read all host entries in the user's ssh config file, 
+-- omit definitions containing wildcards (?, *), are subnets (/) or excluded (!)
 local function listConfigHosts()
     local fileContent = readFile(clink.get_env("userprofile") .. "/.ssh/config")
     local configHosts = {}
