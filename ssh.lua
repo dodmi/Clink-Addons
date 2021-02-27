@@ -13,7 +13,7 @@ Where do I get the latest version?
 https://github.com/dodmi/Clink-Addons/tree/master/
 
 When was this file updated?
-2021-02-22
+2021-02-27
 
 ]]--
 
@@ -76,7 +76,7 @@ local ssh_parser = parser(
     "-4", "-6", "-A", "-a", "-C", "-f", "-G", "-g", "-K", "-k", 
     "-M", "-N", "-n", "-q", "-s", "-T", "-t", "-V", "-v", "-X", 
     "-x", "-Y", "-y", "-I", "-L", "-l", "-m", "-O", "-o", "-p", 
-    "-R", "-w", "-B", "-b", "-c", "-D", "-e", "-I", "-S",
+    "-R", "-w", "-B", "-b", "-c", "-D", "-e", "-S",
     "-Q" .. parser({"cipher", "cipher_auth", "help", "mac", "kex", "kex-gss", "key", "key-cert", "key-plain", "key-sig", "protocol-version", "sig"}),
     "-J" .. parser({hosts}),
     "-W" .. parser({hosts}),
