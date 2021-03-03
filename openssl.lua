@@ -13,7 +13,7 @@ Where do I get the latest version?
 https://github.com/dodmi/Clink-Addons/tree/master/
 
 When was this file updated?
-2021-02-22
+2021-03-03
 
 ]]--
 
@@ -305,11 +305,65 @@ local openssl_parser = parser({
 		"-out" .. parser{clink.filematches} 		-- Parameter Output file
 	),
 	"ocsp" .. parser({}, -- empty {}: don't suggest any positional args
-		"-help"
-		),
+		"-help", "-ignore_err", "-noverify", "-nonce", "-no_nonce", "-resp_no_certs",
+		"-resp_key_id", "-no_certs", "-no_signature_verify", "-no_cert_verify",
+		"-no_chain", "-no_cert_checks", "-no_explicit", "-trust_other", "-no_intern",
+		"-badsig", "-text", "-req_text", "-resp_text", "-no-CAfile", "-no-CApath",
+		"-*", "-ignore_critical", "-issuer_checks", "-crl_check", "-crl_check_all",
+		"-policy_check", "-explicit_policy", "-inhibit_any", "-inhibit_map",
+		"-x509_strict", "-extended_crl", "-use_deltas", "-policy_print", "-check_ss_sig",
+		"-trusted_first", "-suiteB_128_only", "-suiteB_128", "-suiteB_192", "-partial_chain",
+		"-no_alt_chains", "-no_check_time", "-allow_proxy_certs",
+		"-timeout",			-- Parameter Connection timeout (in seconds) to the OCSP responder
+		"-url",				-- Parameter Responder URL
+		"-host",			-- Parameter TCP/IP hostname:port to connect to
+		"-port",			-- Parameter Port to run responder on
+		"-validity_period",	-- Parameter Maximum validity discrepancy in seconds
+		"-status_age",		-- Parameter Maximum status age in seconds
+		"-path",			-- Parameter Path to use in OCSP request
+		"-serial",			-- Parameter Serial number to check
+		"-nmin",			-- Parameter Number of minutes before next update
+		"-nrequest",		-- Parameter Number of requests to accept (default unlimited)
+		"-ndays",			-- Parameter Number of days before next update
+		"-rmd",				-- Parameter Digest Algorithm to use in signature of OCSP response
+		"-rsigopt",			-- Parameter OCSP response signature parameter in n:v form
+		"-header",			-- Parameter key=value header to add
+		"-policy",			-- Parameter adds policy to the acceptable policy set
+		"-purpose",			-- Parameter certificate chain purpose
+		"-verify_name",		-- Parameter verification policy name
+		"-verify_depth",	-- Parameter chain depth limit
+		"-auth_level",		-- Parameter chain authentication security level
+		"-attime",			-- Parameter verification epoch time
+		"-verify_hostname",	-- Parameter expected peer hostname
+		"-verify_email",	-- Parameter expected peer email
+		"-verify_ip",		-- Parameter expected peer IP address
+		"-out" .. parser{clink.filematches}, 			-- Parameter Output filename
+		"-reqin" .. parser{clink.filematches}, 			-- Parameter File with the DER-encoded request
+		"-respin" .. parser{clink.filematches}, 		-- Parameter File with the DER-encoded response
+		"-signer" .. parser{clink.filematches}, 		-- Parameter Certificate to sign OCSP request with
+		"-VAfile" .. parser{clink.filematches}, 		-- Parameter Validator certificates file
+		"-sign_other" .. parser{clink.filematches}, 	-- Parameter Additional certificates to include in signed request
+		"-verify_other" .. parser{clink.filematches},	-- Parameter Additional certificates to search for signer
+		"-CAfile" .. parser{clink.filematches}, 		-- Parameter Trusted certificates file
+		"-CApath" .. parser{clink.filematches}, 		-- Parameter Trusted certificates directory
+		"-signkey" .. parser{clink.filematches}, 		-- Parameter Private key to sign OCSP request with
+		"-reqout" .. parser{clink.filematches}, 		-- Parameter Output file for the DER-encoded request
+		"-respout" .. parser{clink.filematches}, 		-- Parameter Output file for the DER-encoded response
+		"-issuer" .. parser{clink.filematches}, 		-- Parameter Issuer certificate
+		"-cert" .. parser{clink.filematches}, 			-- Parameter Certificate to check
+		"-index" .. parser{clink.filematches}, 			-- Parameter Certificate status index file
+		"-CA" .. parser{clink.filematches}, 			-- Parameter CA certificate
+		"-rsigner" .. parser{clink.filematches}, 		-- Parameter Responder certificate to sign responses with
+		"-rkey" .. parser{clink.filematches}, 			-- Parameter Responder key to sign responses with
+		"-rother" .. parser{clink.filematches} 			-- Parameter Other certificates to include in response
+	),
 	"passwd" .. parser({}, -- empty {}: don't suggest any positional args
-		"-help"
-		),
+		"-help", "-noverify", "-quiet", "-table", "-reverse", "-stdin", "-6", "-5", "-apr1", "-1", "-aixmd5", "-crypt", 
+		"-salt",	-- Parameter Use provided salt
+		"-in" .. parser{clink.filematches}, 			-- Parameter Read passwords from file
+		"-rand" .. parser{clink.filematches}, 			-- Parameter Load the file(s) into the random number generator
+		"-writerand" .. parser{clink.filematches} 		-- Parameter Write random data to the specified file
+	),
 	"pkcs12" .. parser({}, -- empty {}: don't suggest any positional args
 		"-help", "-nokeys", "-keyex", "-keysig", "-nocerts", "-clcerts",
 		"-cacerts", "-noout", "-info", "-chain", "-twopass", "-nomacver", "-descert", "-export", "-noiter",  "-maciter", "-nomaciter", "-nomac", "-LMK", "-nodes", "-no-CAfile", "-no-CApath", "-*",
@@ -500,26 +554,26 @@ local openssl_parser = parser({
 		"-verifyCApath" .. parser{clink.filematches} 	-- Parameter Use dir as cert store path to verify CA certificate
 	),
 	"s_server" .. parser({}, -- empty {}: don't suggest any positional args
-		"-help", "-4", "-6", "-unlink", "-nbio_test", "-crlf", "-debug", "-msg", 
-		"-state", "-no-CAfile", "-no-CApath", "-nocert", "-quiet", 
-		"-no_resume_ephemeral", "-www", "-WWW", "-servername_fatal", "-tlsextdebug", 
-		"-HTTP", "-crl_download", "-no_cache", "-ext_cache", "-verify_return_error", 
-		"-verify_quiet", "-build_chain", "-ign_eof", "-no_ign_eof", "-status", 
-		"-status_verbose", "-security_debug", "-security_debug_verbose", "-brief", 
-		"-rev", "-async", "-no_ssl3", "-no_tls1", "-no_tls1_1", "-no_tls1_2", 
-		"-no_tls1_3", "-bugs", "-no_comp", "-comp", "-no_ticket", "-serverpref", 
-		"-legacy_renegotiation", "-no_renegotiation", "-legacy_server_connect", 
-		"-no_resumption_on_reneg", "-no_legacy_server_connect", "-allow_no_dhe_kex", 
-		"-prioritize_chacha", "-strict", "-debug_broken_protocol", "-no_middlebox", 
-		"-ignore_critical", "-issuer_checks", "-crl_check", "-crl_check_all", 
-		"-policy_check", "-explicit_policy", "-inhibit_any", "-inhibit_map", 
-		"-x509_strict", "-extended_crl", "-use_deltas", "-policy_print", 
-		"-check_ss_sig", "-trusted_first", "-suiteB_128_only", "-suiteB_128", 
-		"-suiteB_192", "-partial_chain", "-no_alt_chains", "-no_check_time", 
-		"-allow_proxy_certs", "-xchain_build", "-nbio", "-tls1", "-tls1_1", 
-		"-tls1_2", "-tls1_3", "-dtls", "-timeout", "-listen", "-stateless", 
-		"-dtls1", "-dtls1_2", "-no_dhe", "-early_data", "-anti_replay", 
-		"-no_anti_replay", 
+		"-help", "-4", "-6", "-unlink", "-nbio_test", "-crlf", "-debug", "-msg",
+		"-state", "-no-CAfile", "-no-CApath", "-nocert", "-quiet",
+		"-no_resume_ephemeral", "-www", "-WWW", "-servername_fatal", "-tlsextdebug",
+		"-HTTP", "-crl_download", "-no_cache", "-ext_cache", "-verify_return_error",
+		"-verify_quiet", "-build_chain", "-ign_eof", "-no_ign_eof", "-status",
+		"-status_verbose", "-security_debug", "-security_debug_verbose", "-brief",
+		"-rev", "-async", "-no_ssl3", "-no_tls1", "-no_tls1_1", "-no_tls1_2",
+		"-no_tls1_3", "-bugs", "-no_comp", "-comp", "-no_ticket", "-serverpref",
+		"-legacy_renegotiation", "-no_renegotiation", "-legacy_server_connect",
+		"-no_resumption_on_reneg", "-no_legacy_server_connect", "-allow_no_dhe_kex",
+		"-prioritize_chacha", "-strict", "-debug_broken_protocol", "-no_middlebox",
+		"-ignore_critical", "-issuer_checks", "-crl_check", "-crl_check_all",
+		"-policy_check", "-explicit_policy", "-inhibit_any", "-inhibit_map",
+		"-x509_strict", "-extended_crl", "-use_deltas", "-policy_print",
+		"-check_ss_sig", "-trusted_first", "-suiteB_128_only", "-suiteB_128",
+		"-suiteB_192", "-partial_chain", "-no_alt_chains", "-no_check_time",
+		"-allow_proxy_certs", "-xchain_build", "-nbio", "-tls1", "-tls1_1",
+		"-tls1_2", "-tls1_3", "-dtls", "-timeout", "-listen", "-stateless",
+		"-dtls1", "-dtls1_2", "-no_dhe", "-early_data", "-anti_replay",
+		"-no_anti_replay",
 		"-port",				-- Parameter TCP/IP port to listen on for connections (default is 4433)
 		"-accept",				-- Parameter TCP/IP optional host:port to listen on (default is *:4433)
 		"-unix",				-- Parameter Unix domain socket to accept on
