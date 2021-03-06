@@ -13,7 +13,7 @@ Where do I get the latest version?
 https://github.com/dodmi/Clink-Addons/tree/master/
 
 When was this file updated?
-2021-03-02
+2021-03-06
 
 ]]--
 
@@ -91,6 +91,32 @@ local function localIPs (token)
     return assignedIPs
 end
 
+-- return the list of supported ciphers
+local function supporrtedCiphers (token)
+    local ciphers = {}
+    local tmpFileName = os.tmpname()
+    os.execute('ssh -Q cipher > ' .. tmpFileName)
+    local fileContent = readFile(tmpFileName)
+    os.remove(tmpFileName)
+    for _, line in ipairs(fileContent) do
+        table.insert(ciphers, line)
+    end
+    return ciphers
+end
+
+-- return the list of supported MACs
+local function supporrtedMACs (token)
+    local macs = {}
+    local tmpFileName = os.tmpname()
+    os.execute('ssh -Q mac > ' .. tmpFileName)
+    local fileContent = readFile(tmpFileName)
+    os.remove(tmpFileName)
+    for _, line in ipairs(fileContent) do
+        table.insert(macs, line)
+    end
+    return macs
+end
+
 local ssh_parser = parser(
     parser({hosts}),
     "-4", "-6", "-A", "-a", "-C", "-f", "-G", "-g", "-K", "-k",
@@ -103,7 +129,9 @@ local ssh_parser = parser(
     "-E" .. parser({clink.filematches}),
     "-F" .. parser({clink.filematches}),
     "-i" .. parser({clink.filematches}),
-    "-b" .. parser({localIPs})
+    "-b" .. parser({localIPs}),
+    "-c" .. parser({supporrtedCiphers}),
+    "-m" .. parser({supporrtedMACs})
 )
 
 clink.arg.register_parser("ssh", ssh_parser)
