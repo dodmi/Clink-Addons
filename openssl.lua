@@ -13,7 +13,7 @@ Where do I get the latest version?
 https://github.com/dodmi/Clink-Addons/tree/master/
 
 When was this file updated?
-2021-03-03
+2021-03-06
 
 ]]--
 
@@ -358,7 +358,7 @@ local openssl_parser = parser({
 		"-rother" .. parser{clink.filematches} 			-- Parameter Other certificates to include in response
 	),
 	"passwd" .. parser({}, -- empty {}: don't suggest any positional args
-		"-help", "-noverify", "-quiet", "-table", "-reverse", "-stdin", "-6", "-5", "-apr1", "-1", "-aixmd5", "-crypt", 
+		"-help", "-noverify", "-quiet", "-table", "-reverse", "-stdin", "-6", "-5", "-apr1", "-1", "-aixmd5", "-crypt",
 		"-salt",	-- Parameter Use provided salt
 		"-in" .. parser{clink.filematches}, 			-- Parameter Read passwords from file
 		"-rand" .. parser{clink.filematches}, 			-- Parameter Load the file(s) into the random number generator
@@ -395,26 +395,74 @@ local openssl_parser = parser({
 		"-out" .. parser{clink.filematches} 	-- Parameter Output file
 	),
 	"pkcs8" .. parser({}, -- empty {}: don't suggest any positional args
-		"-help"
-		),
+		"-help", "-topk8", "-noiter", "-nocrypt", "-scrypt", "-traditional",
+		"-scrypt_N",	-- Parameter Set scrypt N parameter
+		"-scrypt_r",	-- Parameter Set scrypt r parameter
+		"-scrypt_p",	-- Parameter Set scrypt p parameter
+		"-v2",			-- Parameter Use PKCS#5 v2.0 and cipher
+		"-v1",			-- Parameter Use PKCS#5 v1.5 and cipher
+		"-v2prf",		-- Parameter Set the PRF algorithm to use with PKCS#5 v2.0
+		"-iter",		-- Parameter Specify the iteration count
+		"-passin",		-- Parameter Input file pass phrase source
+		"-passout",		-- Parameter Output file pass phrase source
+		"-engine",		-- Parameter Use engine, possibly a hardware device
+		"-inform" .. parser({"PEM", "DER"}),
+		"-outform" .. parser({"PEM", "DER"}),
+		"-in" .. parser{clink.filematches}, 		-- Parameter Input file
+		"-out" .. parser{clink.filematches}, 		-- Parameter Output file
+		"-rand" .. parser{clink.filematches}, 		-- Parameter Load the file(s) into the random number generator
+		"-writerand" .. parser{clink.filematches} 	-- Parameter Write random data to the specified file
+	),
 	"pkey" .. parser({}, -- empty {}: don't suggest any positional args
-		"-help"
-		),
+		"-help", "-pubin", "-pubout", "-text_pub", "-text", "-noout", "-*", "-traditional", "-check", "-pubcheck",
+		"-passin",	-- Parameter Input file pass phrase source
+		"-passout",	-- Parameter Output file pass phrase source
+		"-engine",	-- Parameter Use engine, possibly a hardware device
+		"-inform" .. parser({"PEM", "DER"}),
+		"-outform" .. parser({"PEM", "DER"}),
+		"-in" .. parser{clink.filematches}, 		-- Parameter Input key
+		"-out" .. parser{clink.filematches} 		-- Parameter Output file
+	),
 	"pkeyparam" .. parser({}, -- empty {}: don't suggest any positional args
-		"-help"
-		),
+		"-help", "-text", "-noout", "-check",
+		"-engine",		-- Parameter Use engine, possibly a hardware device
+		"-in" .. parser{clink.filematches}, 		-- Parameter Input file
+		"-out" .. parser{clink.filematches} 		-- Parameter Output file
+	),
 	"pkeyutl" .. parser({}, -- empty {}: don't suggest any positional args
-		"-help"
-		),
+		"-help", "-pubin", "-certin", "-asn1parse", "-hexdump", "-sign",
+		"-verify", "-verifyrecover", "-rev", "-encrypt", "-decrypt",
+		"-derive", "-engine_impl",
+		"-kdf",		-- Parameter Use KDF algorithm
+		"-kdflen",	-- Parameter KDF algorithm output length
+		"-passin",	-- Parameter Input file pass phrase source
+		"-pkeyopt",	-- Parameter Public key options as opt:value
+		"-engine",	-- Parameter Use engine, possibly a hardware device
+		"-peerform" .. parser({"PEM", "DER", "ENGINE"}),
+		"-keyform" .. parser({"PEM", "DER", "ENGINE"}),
+		"-in" .. parser{clink.filematches}, 		-- Parameter Input file - default stdin
+		"-out" .. parser{clink.filematches}, 		-- Parameter Output file - default stdout
+		"-rand" .. parser{clink.filematches}, 		-- Parameter Load the file(s) into the random number generator
+		"-writerand" .. parser{clink.filematches}, 	-- Parameter Write random data to the specified file
+		"-sigfile" .. parser{clink.filematches}, 	-- Parameter Signature file (verify operation only)
+		"-inkey" .. parser{clink.filematches}, 		-- Parameter Input private key file
+		"-peerkey" .. parser{clink.filematches} 	-- Parameter Peer key file used in key derivation
+	),
 	"prime" .. parser({}, -- empty {}: don't suggest any positional args
-		"-help"
-		),
+		"-help", "-hex", "-generate", "-safe",
+		"-bits",	-- Parameter Size of number in bits
+		"-checks"	-- Parameter Number of checks
+	),
 	"rand" .. parser({}, -- empty {}: don't suggest any positional args
-		"-help"
-		),
+		"-help", "-base64", "-hex",
+		"-engine",	-- Parameter Use engine, possibly a hardware device
+		"-out" .. parser{clink.filematches}, 		-- Parameter Output file
+		"-rand" .. parser{clink.filematches}, 		-- Parameter Load the file(s) into the random number generator
+		"-writerand" .. parser{clink.filematches} 	-- Parameter Write random data to the specified file
+	),
 	"rehash" .. parser({}, -- empty {}: don't suggest any positional args
 		"-help"
-		),
+	),
 	"req" .. parser({}, -- empty {}: don't suggest any positional args
 		"-help", "-pubkey", "-new", "-batch", "-newhdr", "-modulus",
 		"-verify", "-nodes", "-noout", "-verbose", "-utf8", "-text",
@@ -446,11 +494,30 @@ local openssl_parser = parser({
 		"-writerand" .. parser{clink.filematches} 	-- Parameter Write random data to the specified file
 	),
 	"rsa" .. parser({}, -- empty {}: don't suggest any positional args
-		"-help"
-		),
+		"-help", "-pubin", "-pubout", "-RSAPublicKey_in", "-RSAPublicKey_out",
+		"-noout", "-text", "-modulus", "-check", "-*", "-pvk-strong",
+		"-pvk-weak", "-pvk-none",
+		"-passout",	-- Parameter Output file pass phrase source
+		"-passin",	-- Parameter Input file pass phrase source
+		"-engine",	-- Parameter Use engine, possibly a hardware device
+		"-inform" .. parser({"PEM", "DER"}),
+		"-outform" .. parser({"PEM", "DER", "PVK"}),
+		"-in" .. parser{clink.filematches}, 	-- Parameter Input file
+		"-out" .. parser{clink.filematches} 	-- Parameter Output file
+	),
 	"rsautl" .. parser({}, -- empty {}: don't suggest any positional args
-		"-help"
-		),
+		"-help", "-pubin", "-certin", "-ssl", "-raw", "-pkcs", "-oaep",
+		"-sign", "-verify", "-asn1parse", "-hexdump", "-x931", "-rev",
+		"-encrypt", "-decrypt",
+		"-passin",	-- Parameter Input file pass phrase source
+		"-engine",	-- Parameter Use engine, possibly a hardware device
+		"-keyform" .. parser({"PEM", "DER", "ENGINE"}),
+		"-in" .. parser{clink.filematches}, 		-- Parameter Input file
+		"-out" .. parser{clink.filematches}, 		-- Parameter Output file
+		"-inkey" .. parser{clink.filematches}, 		-- Parameter Input key
+		"-rand" .. parser{clink.filematches}, 		-- Parameter Load the file(s) into the random number generator
+		"-writerand" .. parser{clink.filematches} 	-- Parameter Write random data to the specified file
+	),
 	"s_client" .. parser({}, -- empty {}: don't suggest any positional args
 		"-help","-4", "-6", "-no-CAfile", "-no-CApath", "-dane_ee_no_namechecks",
 		"-reconnect", "-showcerts", "-debug", "-msg", "-msgfile outfile",
@@ -662,32 +729,231 @@ local openssl_parser = parser({
 		"-verifyCApath" .. parser{clink.dirmatches} 	-- Parameter use dir as path to verify CA certificate
 	),
 	"s_time" .. parser({}, -- empty {}: don't suggest any positional args
-		"-help"
-		),
+		"-help", "-no-CAfile", "-no-CApath", "-new", "-reuse", "-bugs",
+		"-connect",			-- Parameter Where to connect as post:port (default is localhost:4433)
+		"-cipher",			-- Parameter TLSv1.2 and below cipher list to be used
+		"-ciphersuites",	-- Parameter Specify TLSv1.3 ciphersuites to be used
+		"-nameopt",			-- Parameter Various certificate name options
+		"-verify",			-- Parameter Turn on peer certificate verification, set depth
+		"-time",			-- Parameter Seconds to collect data, default 30
+		"-www",				-- Parameter Fetch specified page from the site
+		"-cert" .. parser{clink.filematches}, 		-- Parameter Cert file to use, PEM format assumed
+		"-key" .. parser{clink.filematches}, 		-- Parameter File with key, PEM; default is -cert file
+		"-cafile" .. parser{clink.filematches}, 	-- Parameter PEM format file of CA's
+		"-CAfile" .. parser{clink.filematches}, 	-- Parameter PEM format file of CA's
+		"-CApath" .. parser{clink.dirmatches} 	-- Parameter PEM format directory of CA's
+	),
 	"sess_id" .. parser({}, -- empty {}: don't suggest any positional args
-		"-help"
-		),
-	"smime" .. parser({}, -- empty {}: don't suggest any positional args
-		"-help"
-		),
+		"-help", "-text", "-cert", "-noout",
+		"-context",	-- Parameter Set the session ID context
+		"-inform" .. parser({"PEM", "DER"}),
+		"-outform" .. parser({"PEM", "DER", "NSS"}),
+		"-in" .. parser{clink.filematches}, 	-- Parameter Input file - default stdin
+		"-out" .. parser{clink.filematches} 	-- Parameter Output file - default stdout
+	),
+	"smime" .. parser(
+		parser({clink.filematches}),
+		"-help", "-encrypt", "-decrypt", "-sign", "-verify", "-pk7out",
+		"-nointern", "-nosigs", "-noverify", "-nocerts", "-nodetach",
+		"-noattr", "-binary", "-text", "-no-CAfile", "-no-CApath", "-resign",
+		"-nochain", "-nosmimecap", "-stream", "-indef", "-noindef", "-crlfeol",
+		"-*", "-ignore_critical", "-issuer_checks", "-crl_check", "-crl_check_all",
+		"-policy_check", "-explicit_policy", "-inhibit_any", "-inhibit_map",
+		"-x509_strict", "-extended_crl", "-use_deltas", "-policy_print",
+		"-check_ss_sig", "-trusted_first", "-suiteB_128_only", "-suiteB_128",
+		"-suiteB_192", "-partial_chain", "-no_alt_chains", "-no_check_time",
+		"-allow_proxy_certs",
+		"-to",				-- Parameter To address
+		"-from",			-- Parameter From address
+		"-subject",			-- Parameter Subject
+		"-passin",			-- Parameter Input file pass phrase source
+		"-md",				-- Parameter Digest algorithm to use when signing or resigning
+		"-policy",			-- Parameter adds policy to the acceptable policy set
+		"-purpose",			-- Parameter certificate chain purpose
+		"-verify_name",		-- Parameter verification policy name
+		"-verify_depth",	-- Parameter chain depth limit
+		"-auth_level",		-- Parameter chain authentication security level
+		"-attime",			-- Parameter verification epoch time
+		"-verify_hostname",	-- Parameter expected peer hostname
+		"-verify_email",	-- Parameter expected peer email
+		"-verify_ip",		-- Parameter expected peer IP address
+		"-engine",			-- Parameter Use engine, possibly a hardware device
+		"-inform" .. parser({"SMIME", "PEM", "DER"}),
+		"-keyform" .. parser({"PEM", "ENGINE"}),
+		"-outform" .. parser({"SMIME", "PEM", "DER"}),
+		"-certfile" .. parser{clink.filematches}, 	-- Parameter Other certificates file
+		"-signer" .. parser{clink.filematches}, 	-- Parameter Signer certificate file
+		"-recip" .. parser{clink.filematches}, 		-- Parameter Recipient certificate file for decryption
+		"-in" .. parser{clink.filematches}, 		-- Parameter Input file
+		"-inkey" .. parser{clink.filematches}, 		-- Parameter Input private key (if not signer or recipient)
+		"-out" .. parser{clink.filematches}, 		-- Parameter Output file
+		"-content" .. parser{clink.filematches}, 	-- Parameter Supply or override content for detached signature
+		"-CAfile" .. parser{clink.filematches}, 	-- Parameter Trusted certificates file
+		"-rand" .. parser{clink.filematches}, 		-- Parameter Load the file(s) into the random number generator
+		"-writerand" .. parser{clink.filematches}, 	-- Parameter Write random data to the specified file
+		"-CApath" .. parser{clink.dirmatches}	 	-- Parameter Trusted certificates directory
+	),
 	"speed" .. parser({}, -- empty {}: don't suggest any positional args
-		"-help"
-		),
+		"-help", "-decrypt", "-aead", "-mb", "-mr", "-elapsed",
+		"-evp",			-- Parameter Use EVP-named cipher or digest
+		"-async_jobs",	-- Parameter Enable async mode and start specified number of jobs
+		"-engine",		-- Parameter Use engine, possibly a hardware device
+		"-primes",		-- Parameter Specify number of primes (for RSA only)
+		"-seconds",		-- Parameter Run benchmarks for specified amount of seconds
+		"-bytes",		-- Parameter Run [non-PKI] benchmarks on custom-sized buffer
+		"-misalign",	-- Parameter Use specified offset to mis-align buffers
+		"-rand" .. parser{clink.filematches}, 		-- Parameter Load the file(s) into the random number generator
+		"-writerand" .. parser{clink.filematches} 	-- Parameter Write random data to the specified file
+	),
 	"spkac" .. parser({}, -- empty {}: don't suggest any positional args
-		"-help"
-		),
+		"-help", "-noout", "-pubkey", "-verify",
+		"-passin",		-- Parameter Input file pass phrase source
+		"-challenge",	-- Parameter Challenge string
+		"-spkac",		-- Parameter Alternative SPKAC name
+		"-spksect",		-- Parameter Specify the name of an SPKAC-dedicated section of configuration
+		"-engine",		-- Parameter Use engine, possibly a hardware device
+		"-keyform" .. parser({"PEM", "DER", "ENGINE"}),
+		"-in" .. parser{clink.filematches},		-- Parameter Input file
+		"-out" .. parser{clink.filematches},	-- Parameter Output file
+		"-key" .. parser{clink.filematches} 	-- Parameter Create SPKAC using private key
+	),
 	"srp" .. parser({}, -- empty {}: don't suggest any positional args
-		"-help"
-		),
+		"-help", "-verbose", "-add", "-modify", "-delete", "-list",
+		"-name",		-- Parameter The particular srp definition to use
+		"-gn",			-- Parameter Set g and N values to be used for new verifier
+		"-userinfo",	-- Parameter Additional info to be set for user
+		"-passin",		-- Parameter Input file pass phrase source
+		"-passout",		-- Parameter Output file pass phrase source
+		"-engine",		-- Parameter Use engine, possibly a hardware device
+		"-config" .. parser{clink.filematches}, 	-- Parameter A config file
+		"-srpvfile" .. parser{clink.filematches}, 	-- Parameter The srp verifier file name
+		"-rand" .. parser{clink.filematches}, 		-- Parameter Load the file(s) into the random number generator
+		"-writerand" .. parser{clink.filematches} 	-- Parameter Write random data to the specified file
+	),
 	"storeutl" .. parser({}, -- empty {}: don't suggest any positional args
-		"-help"
-		),
+		"-help", "-text", "-noout", "-certs", "-keys", "-crls", "-*", "-r",
+		"-passin",		-- Parameter Input file pass phrase source
+		"-subject",		-- Parameter Search by subject
+		"-issuer",		-- Parameter Search by issuer and serial, issuer name
+		"-serial",		-- Parameter Search by issuer and serial, serial number
+		"-fingerprint",	-- Parameter Search by public key fingerprint, given in hex
+		"-alias",		-- Parameter Search by alias
+		"-engine",		-- Parameter Use engine, possibly a hardware device
+ 		"-out" .. parser{clink.filematches} 	-- Parameter Output file - default stdout
+	),
 	"ts" .. parser({}, -- empty {}: don't suggest any positional args
-		"-help"
-		),
-	"verify" .. parser({}, -- empty {}: don't suggest any positional args
-		"-help"
-		),
+		"-help",
+		"-query" .. parser({
+			"-no_nonce", "-cert", "-token_in", "-token_out", "-text", "-*",
+			"-section",		-- Parameter Section to use within config file
+			"-digest",		-- Parameter Digest (as a hex string)
+			"-tspolicy",	-- Parameter Policy OID to use
+			"-passin",		-- Parameter Input file pass phrase source
+			"-engine",		-- Parameter Use engine, possibly a hardware device
+			"-config" .. parser{clink.filematches}, 	-- Parameter Configuration file
+			"-data" .. parser{clink.filematches}, 		-- Parameter File to hash
+			"-rand" .. parser{clink.filematches}, 		-- Parameter Load the file(s) into the random number generator
+			"-writerand" .. parser{clink.filematches}, 	-- Parameter Write random data to the specified file
+			"-in" .. parser{clink.filematches}, 		-- Parameter Input file
+			"-out" .. parser{clink.filematches}, 		-- Parameter Output file
+			"-queryfile" .. parser{clink.filematches}, 	-- Parameter File containing a TS query
+			"-inkey" .. parser{clink.filematches}, 		-- Parameter File with private key for reply
+			"-signer" .. parser{clink.filematches}, 	-- Parameter Signer certificate file
+			"-chain" .. parser{clink.filematches}, 		-- Parameter File with signer CA chain
+			"-CAfile" .. parser{clink.filematches}, 	-- Parameter File with trusted CA certs
+			"-untrusted" .. parser{clink.filematches}, 	-- Parameter File with untrusted certs
+			"-CApath" .. parser{clink.dirmatches}, 	-- Parameter Path to trusted CA files
+		}),
+		"-reply" .. parser({
+			"-no_nonce", "-cert", "-token_in", "-token_out", "-text", "-*",
+			"-section",		-- Parameter Section to use within config file
+			"-digest",		-- Parameter Digest (as a hex string)
+			"-tspolicy",	-- Parameter Policy OID to use
+			"-passin",		-- Parameter Input file pass phrase source
+			"-engine",		-- Parameter Use engine, possibly a hardware device
+			"-config" .. parser{clink.filematches}, 	-- Parameter Configuration file
+			"-data" .. parser{clink.filematches}, 		-- Parameter File to hash
+			"-rand" .. parser{clink.filematches}, 		-- Parameter Load the file(s) into the random number generator
+			"-writerand" .. parser{clink.filematches}, 	-- Parameter Write random data to the specified file
+			"-in" .. parser{clink.filematches}, 		-- Parameter Input file
+			"-out" .. parser{clink.filematches}, 		-- Parameter Output file
+			"-queryfile" .. parser{clink.filematches}, 	-- Parameter File containing a TS query
+			"-inkey" .. parser{clink.filematches}, 		-- Parameter File with private key for reply
+			"-signer" .. parser{clink.filematches}, 	-- Parameter Signer certificate file
+			"-chain" .. parser{clink.filematches}, 		-- Parameter File with signer CA chain
+			"-CAfile" .. parser{clink.filematches}, 	-- Parameter File with trusted CA certs
+			"-untrusted" .. parser{clink.filematches}, 	-- Parameter File with untrusted certs
+			"-CApath" .. parser{clink.dirmatches}, 	-- Parameter Path to trusted CA files
+		}),
+		"-verify" .. parser({
+			-- common part (like -query  and -reply)
+			"-no_nonce", "-cert", "-token_in", "-token_out", "-text", "-*",
+			"-section",		-- Parameter Section to use within config file
+			"-digest",		-- Parameter Digest (as a hex string)
+			"-tspolicy",	-- Parameter Policy OID to use
+			"-passin",		-- Parameter Input file pass phrase source
+			"-engine",		-- Parameter Use engine, possibly a hardware device
+			"-config" .. parser{clink.filematches}, 	-- Parameter Configuration file
+			"-data" .. parser{clink.filematches}, 		-- Parameter File to hash
+			"-rand" .. parser{clink.filematches}, 		-- Parameter Load the file(s) into the random number generator
+			"-writerand" .. parser{clink.filematches}, 	-- Parameter Write random data to the specified file
+			"-in" .. parser{clink.filematches}, 		-- Parameter Input file
+			"-out" .. parser{clink.filematches}, 		-- Parameter Output file
+			"-queryfile" .. parser{clink.filematches}, 	-- Parameter File containing a TS query
+			"-inkey" .. parser{clink.filematches}, 		-- Parameter File with private key for reply
+			"-signer" .. parser{clink.filematches}, 	-- Parameter Signer certificate file
+			"-chain" .. parser{clink.filematches}, 		-- Parameter File with signer CA chain
+			"-CAfile" .. parser{clink.filematches}, 	-- Parameter File with trusted CA certs
+			"-untrusted" .. parser{clink.filematches}, 	-- Parameter File with untrusted certs
+			"-CApath" .. parser{clink.dirmatches}, 	-- Parameter Path to trusted CA files
+			-- special to -verify parameter
+			"-ignore_critical", "-issuer_checks", "-crl_check",
+			"-crl_check_all", "-policy_check", "-explicit_policy",
+			"-inhibit_any", "-inhibit_map", "-x509_strict", "-extended_crl",
+			"-use_deltas", "-policy_print", "-check_ss_sig", "-trusted_first",
+			"-suiteB_128_only", "-suiteB_128", "-suiteB_192", "-partial_chain",
+			"-no_alt_chains", "-no_check_time", "-allow_proxy_certs",
+			"-policy",			-- Parameter adds policy to the acceptable policy set
+			"-purpose",			-- Parameter certificate chain purpose
+			"-verify_name",		-- Parameter verification policy name
+			"-verify_depth",	-- Parameter chain depth limit
+			"-auth_level",		-- Parameter chain authentication security level
+			"-attime",			-- Parameter verification epoch time
+			"-verify_hostname",	-- Parameter expected peer hostname
+			"-verify_email",	-- Parameter expected peer email
+			"-verify_ip"		-- Parameter expected peer IP address
+		})
+	),
+	"verify"  .. parser(
+		parser({clink.filematches}),
+		"-help", "-verbose", "-no-CAfile", "-no-CApath", "-crl_download",
+		"-show_chain", "-ignore_critical", "-issuer_checks", "-crl_check",
+		"-crl_check_all", "-policy_check", "-explicit_policy", "-inhibit_any",  
+		"-inhibit_map", "-x509_strict", "-extended_crl", "-use_deltas", 
+		"-policy_print", "-check_ss_sig", "-trusted_first", "-suiteB_128_only",
+		"-suiteB_128", "-suiteB_192", "-partial_chain", "-no_alt_chains", 
+		"-no_check_time", "-allow_proxy_certs", 
+		"-nameopt",			-- Parameter Various certificate name options
+		"-policy",			-- Parameter adds policy to the acceptable policy set
+		"-verify_depth",	-- Parameter chain depth limit
+		"-auth_level",		-- Parameter chain authentication security level
+		"-attime",			-- Parameter verification epoch time
+		"-verify_hostname",	-- Parameter expected peer hostname
+		"-verify_email",	-- Parameter expected peer email
+		"-verify_ip",		-- Parameter expected peer IP address
+		"-engine",			-- Parameter Use engine, possibly a hardware device
+		"-purpose" .. parser({
+			"sslclient", "sslserver", "nssslserver", "smimesign", 
+			"smimeencrypt", "crlsign", "any", "ocsphelper", 
+			"timestampsign" 
+		}),
+		"-verify_name" .. parser({ "default", "pkcs7", "smime_sign", "ssl_client", "ssl_server" }),
+		"-CAfile" .. parser{clink.filematches}, 	-- Parameter A file of trusted certificates
+		"-CApath" .. parser{clink.filematches}, 	-- Parameter A directory of trusted certificates
+		"-untrusted" .. parser{clink.filematches}, 	-- Parameter A file of untrusted certificates
+		"-trusted" .. parser{clink.filematches}, 	-- Parameter A file of trusted certificates
+		"-CRLfile" .. parser{clink.filematches} 	-- Parameter File containing one or more CRL's (in PEM format) to load
+	),
 	"version" .. parser({}, -- empty {}: don't suggest any positional args
 		"-help", "-a", "-b", "-d", "-e", "-f", "-o", "-p", "-r", "-v"
 	),
