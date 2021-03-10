@@ -13,7 +13,7 @@ Where do I get the latest version?
 https://github.com/dodmi/Clink-Addons/tree/master/
 
 When was this file updated?
-2021-03-06
+2021-03-10
 
 ]]--
 
@@ -111,7 +111,6 @@ local openssl_parser = parser({
 		"-to",						-- Parameter To address
 		"-from",					-- Parameter From address
 		"-subject",					-- Parameter Subject
-		"-signer",					-- Parameter Signer certificate file
 		"-keyopt",					-- Parameter Set public key parameters as n:v pairs
 		"-receipt_request_from",	-- Parameter val
 		"-receipt_request_to",		-- Parameter val
@@ -135,13 +134,14 @@ local openssl_parser = parser({
 		"-out" .. parser({clink.filematches}), 				-- Parameter Output file
 		"-verify_receipt" .. parser({clink.filematches}), 	-- Parameter infile
 		"-certfile" .. parser({clink.filematches}), 			-- Parameter Other certificates file
-		"-CAfile" .. parser({clink.filematches}), 			-- Parameter Trusted certificates file
+		"-CAfile" .. parser({clink.filematches}), 				-- Parameter Trusted certificates file
 		"-recip" .. parser({clink.filematches}), 				-- Parameter Recipient cert file for decryption
+		"-signer" .. parser({clink.filematches}),				-- Parameter Signer certificate file
 		"-certsout" .. parser({clink.filematches}), 			-- Parameter Certificate output file
 		"-inkey" .. parser({clink.filematches}), 				-- Parameter Input private key (if not signer or recipient)
 		"-rand" .. parser({clink.filematches}), 				-- Parameter Load the file(s) into the random number generator
 		"-writerand" .. parser({clink.filematches}), 			-- Parameter Write random data to the specified file
-		"-content" .. parser({clink.filematches}), 			-- Parameter Supply or override content for detached signature
+		"-content" .. parser({clink.filematches}), 				-- Parameter Supply or override content for detached signature
 		"-CApath" .. parser({clink.dirmatches}) 				-- Parameter trusted certificates directory
 	),
 	"crl" .. parser({}, -- empty {}: don't suggest any positional args
@@ -352,7 +352,6 @@ local openssl_parser = parser({
 		"-sign_other" .. parser({clink.filematches}), 	-- Parameter Additional certificates to include in signed request
 		"-verify_other" .. parser({clink.filematches}),	-- Parameter Additional certificates to search for signer
 		"-CAfile" .. parser({clink.filematches}), 		-- Parameter Trusted certificates file
-		"-CApath" .. parser({clink.filematches}), 		-- Parameter Trusted certificates directory
 		"-signkey" .. parser({clink.filematches}), 		-- Parameter Private key to sign OCSP request with
 		"-reqout" .. parser({clink.filematches}), 		-- Parameter Output file for the DER-encoded request
 		"-respout" .. parser({clink.filematches}), 		-- Parameter Output file for the DER-encoded response
@@ -362,7 +361,8 @@ local openssl_parser = parser({
 		"-CA" .. parser({clink.filematches}), 			-- Parameter CA certificate
 		"-rsigner" .. parser({clink.filematches}), 		-- Parameter Responder certificate to sign responses with
 		"-rkey" .. parser({clink.filematches}), 			-- Parameter Responder key to sign responses with
-		"-rother" .. parser({clink.filematches}) 			-- Parameter Other certificates to include in response
+		"-rother" .. parser({clink.filematches}), 			-- Parameter Other certificates to include in response
+		"-CApath" .. parser({clink.dirmatches}) 		-- Parameter Trusted certificates directory
 	),
 	"passwd" .. parser({}, -- empty {}: don't suggest any positional args
 		"-help", "-noverify", "-quiet", "-table", "-reverse", "-stdin", "-6", "-5", "-apr1", "-1", "-aixmd5", "-crypt",
@@ -623,9 +623,9 @@ local openssl_parser = parser({
 		"-ctlogfile" .. parser({clink.filematches}), 		-- Parameter CT log list CONF file
 		"-keylogfile" .. parser({clink.filematches}), 	-- Parameter Write TLS secrets to file
 		"-early_data" .. parser({clink.filematches}), 	-- Parameter File to send as early data
-		"-CApath" .. parser({clink.filematches}), 		-- Parameter PEM format directory of CA's
-		"-chainCApath" .. parser({clink.filematches}), 	-- Parameter Use dir as cert store path to build CA certificate chain
-		"-verifyCApath" .. parser({clink.filematches}) 	-- Parameter Use dir as cert store path to verify CA certificate
+		"-CApath" .. parser({clink.dirmatches}), 		-- Parameter PEM format directory of CA's
+		"-chainCApath" .. parser({clink.dirematches}), 	-- Parameter Use dir as cert store path to build CA certificate chain
+		"-verifyCApath" .. parser({clink.dirmatches}) 	-- Parameter Use dir as cert store path to verify CA certificate
 	),
 	"s_server" .. parser({}, -- empty {}: don't suggest any positional args
 		"-help", "-4", "-6", "-unlink", "-nbio_test", "-crlf", "-debug", "-msg",
@@ -665,7 +665,6 @@ local openssl_parser = parser({
 		"-keymatexportlen",		-- Parameter Export len bytes of keying material (default 20)
 		"-status_timeout",		-- Parameter Status request responder timeout
 		"-status_url",			-- Parameter Status request fallback URL
-		"-ssl_config",			-- Parameter Configure SSL_CTX using the configuration 'val'
 		"-max_send_frag",		-- Parameter Maximum Size of send frames
 		"-split_send_frag",		-- Parameter Size used to split data for encrypt pipelines
 		"-max_pipelines",		-- Parameter Maximum number of encrypt/decrypt pipelines to be used
@@ -725,6 +724,7 @@ local openssl_parser = parser({
 		"-chainCAfile" .. parser({clink.filematches}),	-- Parameter CA file for cert chain (PEM format)
 		"-verifyCAfile" .. parser({clink.filematches}), 	-- Parameter CA file for cert verification (PEM format)
 		"-status_file" .. parser({clink.filematches}), 	-- Parameter File containing DER encoded OCSP Response
+		"-ssl_config" .. parser({clink.filematches}),	-- Parameter Configure SSL_CTX using the configuration 'val'
 		"-xkey" .. parser({clink.filematches}), 			-- Parameter key for Extended certificates
 		"-xcert" .. parser({clink.filematches}), 			-- Parameter cert for Extended certificates
 		"-xchain" .. parser({clink.filematches}), 		-- Parameter chain for Extended certificates
@@ -978,7 +978,6 @@ local openssl_parser = parser({
 		"-setalias",	-- Parameter Set certificate alias
 		"-days",		-- Parameter How long till expiry of a signed certificate - def 30 days
 		"-checkend",	-- Parameter Check whether the cert expires in the next n seconds, exit code 1 or 0
-		"-signkey",		-- Parameter Self sign cert with arg
 		"-set_serial",	-- Parameter Serial number to use
 		"-ext",			-- Parameter Print various X509V3 extensions
 		"-extensions",	-- Parameter Section from config file to use
@@ -1000,6 +999,7 @@ local openssl_parser = parser({
 		"-CAkey" .. parser({clink.filematches}), 		-- Parameter The CA key as PEM; if not in CAfile
 		"-CAserial" .. parser({clink.filematches}), 	-- Parameter Serial file
 		"-extfile" .. parser({clink.filematches}), 	-- Parameter File with X509V3 extensions to add
+		"-signkey" .. parser({clink.filematches}),		-- Parameter Self sign cert with arg
 		"-rand" .. parser({clink.filematches}), 		-- Parameter Load the file(s) into random number generator
 		"-writerand" .. parser({clink.filematches}), 	-- Parameter Write random data to the specified file
 		"-force_pubkey" .. parser({clink.filematches}) -- Parameter Force the Key to put inside certificate
