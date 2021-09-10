@@ -3,6 +3,10 @@
 What is this?
 This is a definition file for command completion in Clink.
 
+Are there any requirements?
+- "modern CLink" (version 1.2 or later)
+- OpenSSL 1.1.* or 3.0.* 
+
 How to use this file?
 - Run 'clink info'
 - Place the file in one of the script locations
@@ -13,9 +17,41 @@ Where do I get the latest version?
 https://github.com/dodmi/Clink-Addons/tree/master/
 
 When was this file updated?
-2021-03-10
+2021-09-10
 
 ]]--
+
+-- read the file "filename" into a table
+local function readFile(filename)
+    local lines = {}
+    local f = io.open(filename, "r")
+    if not f then return lines end
+
+    for line in f:lines() do table.insert(lines, line) end
+
+    f:close()
+    return lines
+end
+
+-- return the installed OpenSSL Version (Major.Minor)
+local function getOpenSSLVersion()
+    local tmpFileName = os.tmpname()
+    os.execute('openssl version > ' .. tmpFileName)
+    local fileContent = readFile(tmpFileName)
+    os.remove(tmpFileName)
+	local version = "0.0"
+	local tmp
+    for _, line in ipairs(fileContent) do
+        tmp = line:match('^OpenSSL%s+(%d+%.%d+)%..*$')
+		if tmp then 
+			version = tmp
+			break
+		end
+    end
+    return version
+end
+
+local parser = clink.arg.new_parser
 
 local digests = { 
 	"BLAKE2b512", "BLAKE2s256", "MD4", "MD5", "MD5-SHA1", "MDC2", 
@@ -24,8 +60,7 @@ local digests = {
 	"SHA512-224", "SHA512-256", "SHAKE128", "SHAKE256", "SM3", "whirlpool" 
 }
 
-local parser = clink.arg.new_parser
-local openssl_parser = parser({
+local openSSL10CommandLine = {
     "asn1parse" .. parser({}, -- empty {}: don't suggest any positional args
         "-help", "-i", "-noout", "-dump", "-strictpem",
 		"-offset",		-- Parameter +int file offset
@@ -624,7 +659,7 @@ local openssl_parser = parser({
 		"-keylogfile" .. parser({clink.filematches}), 	-- Parameter Write TLS secrets to file
 		"-early_data" .. parser({clink.filematches}), 	-- Parameter File to send as early data
 		"-CApath" .. parser({clink.dirmatches}), 		-- Parameter PEM format directory of CA's
-		"-chainCApath" .. parser({clink.dirematches}), 	-- Parameter Use dir as cert store path to build CA certificate chain
+		"-chainCApath" .. parser({clink.dirmatches}), 	-- Parameter Use dir as cert store path to build CA certificate chain
 		"-verifyCApath" .. parser({clink.dirmatches}) 	-- Parameter Use dir as cert store path to verify CA certificate
 	),
 	"s_server" .. parser({}, -- empty {}: don't suggest any positional args
@@ -1004,7 +1039,170 @@ local openssl_parser = parser({
 		"-writerand" .. parser({clink.filematches}), 	-- Parameter Write random data to the specified file
 		"-force_pubkey" .. parser({clink.filematches}) -- Parameter Force the Key to put inside certificate
 	)
-})
+}
+
+local openSSL30CommandLine = {
+	"cmp" .. parser({}, -- empty {}: don't suggest any positional args
+		"-help", "-san_nodefault", "-policy_oids_critical", 
+		"-implicit_confirm", "-disable_confirm", "-ignore_keyusage", 
+		"-unprotected_errors", "-unprotected_requests", "-tls_used", "-batch",
+		"-reqin_new_tid", "-use_mock_srv", "-grant_implicitconf", "-send_error", 
+		"-send_unprotected", "-send_unprot_err", "-accept_unprotected", 
+		"-accept_unprot_err", "-accept_raverified", "-ignore_critical", 
+		"-issuer_checks", "-crl_check", "-crl_check_all", "-policy_check", 
+		"-explicit_policy", "-inhibit_any", "-inhibit_map", "-x509_strict", 
+		"-extended_crl", "-use_deltas", "-policy_print", "-check_ss_sig", 
+		"-trusted_first", "-suiteB_128_only", "-suiteB_128", "-suiteB_192", 
+		"-partial_chain", "-no_alt_chains", "-no_check_time", "-allow_proxy_certs", 
+		"-section", 	-- Parameter val Section(s) in config file to get options from. "" = 'default'. Default 'cmp'
+		"-cmd", 		-- Parameter val CMP request to send: ir/cr/kur/p10cr/rr/genm
+		"-infotype", 	-- Parameter val InfoType name for requesting specific info in genm, e.g. 'signKeyPairTypes'
+		"-geninfo", 	-- Parameter val generalInfo integer values to place in request PKIHeader with given OID specified in the form <OID>:int:<n>, e.g. "1.2.3.4:int:56789"
+		"-mac",			-- Parameter val MAC algorithm to use in PBM-based message protection. Default "hmac-sha1"
+		"-newkey", 		-- Parameter val Private or public key for the requested cert. Default: CSR key or client key
+		"-newkeypass", 	-- Parameter val New private key pass phrase source
+		"-subject", 	-- Parameter val Distinguished Name (DN) of subject to use in the requested cert template For kur, default is subject of -csr arg or else of reference cert (see -oldcert) this default is used for ir and cr only if no Subject Alt Names are set
+		"-issuer", 		-- Parameter val DN of the issuer to place in the requested certificate template also used as recipient if neither -recipient nor -srvcert are given
+		"-days", 		-- Parameter nonneg Requested validity time of the new certificate in number of days
+		"-reqexts", 	-- Parameter val Name of config file section defining certificate request extensions. Augments or replaces any extensions contained CSR given with -csr
+		"-sans", 		-- Parameter val Subject Alt Names (IPADDR/DNS/URI) to add as (critical) cert req extension
+		"-policies", 	-- Parameter val Name of config file section defining policies certificate request extension
+		"-policy_oids", -- Parameter val Policy OID(s) to add as policies certificate request extension
+		"-popo", 		-- Parameter int Proof-of-Possession (POPO) method to use for ir/cr/kur where -1 = NONE, 0 = RAVERIFIED, 1 = SIGNATURE (default), 2 = KEYENC
+		"-out_trusted", -- Parameter val Certificates to trust when verifying newly enrolled certificates
+		"-oldcert", 	-- Parameter val Certificate to be updated (defaulting to -cert) or to be revoked in rr; also used as reference (defaulting to -cert) for subject DN and SANs. Its issuer is used as recipient unless -recipient, -srvcert, or -issuer given
+		"-server",		-- Parameter val [http[s]://]address[:port][/path] of CMP server. Default port 80 or 443. address may be a DNS name or an IP address; path can be overridden by -path
+		"-path", 		-- Parameter val HTTP path (aka CMP alias) at the CMP server. Default from -server, else "/"
+		"-proxy", 		-- Parameter val [http[s]://]address[:port][/path] of HTTP(S) proxy to use; path is ignored
+		"-no_proxy", 	-- Parameter val List of addresses of servers not to use HTTP(S) proxy for Default from environment variable 'no_proxy', else 'NO_PROXY', else none
+		"-recipient", 	-- Parameter val DN of CA. Default: subject of -srvcert, -issuer, issuer of -oldcert or -cert
+		"-msg_timeout", -- Parameter nonneg Number of seconds allowed per CMP message round trip, or 0 for infinite
+		"-total_timeout",	-- Parameter nonneg Overall time an enrollment incl. polling may take. Default 0 = infinite
+		"-trusted", 		-- Parameter val Certificates to trust as chain roots when verifying signed CMP responses unless -srvcert is given
+		"-untrusted", 		-- Parameter val Intermediate CA certs for chain construction for CMP/TLS/enrolled certs
+		"-srvcert", 		-- Parameter val Server cert to pin and trust directly when verifying signed CMP responses
+		"-expect_sender", 	-- Parameter val DN of expected sender of responses. Defaults to subject of -srvcert, if any
+		"-ref", 			-- Parameter val Reference value to use as senderKID in case no -cert is given
+		"-secret",	 		-- Parameter val Prefer PBM (over signatures) for protecting msgs with given password source
+		"-cert", 			-- Parameter val Client's CMP signer certificate; its public key must match the -key argument This also used as default reference for subject DN and SANs. Any further certs included are appended to the untrusted certs
+		"-own_trusted", 	-- Parameter val Optional certs to verify chain building for own CMP signer cert
+		"-key", 			-- Parameter val CMP signer private key, not used when -secret given
+		"-keypass", 		-- Parameter val Client private key (and cert and old cert) pass phrase source
+		"-extracerts", 		-- Parameter val Certificates to append in extraCerts field of outgoing messages. This can be used as the default CMP signer cert chain to include
+		"-otherpass", 		-- Parameter val Pass phrase source potentially needed for loading certificates of others
+		"-engine", 			-- Parameter val Use crypto engine with given identifier, possibly a hardware device. Engines may also be defined in OpenSSL config file engine section.
+		"-provider", 		-- Parameter val Provider to load (can be specified multiple times)
+		"-propquery", 		-- Parameter val Property query used when fetching algorithms
+		"-tls_cert",		-- Parameter val Client's TLS certificate. May include chain to be provided to TLS server
+		"-tls_key", 		-- Parameter val Private key for the client's TLS certificate
+		"-tls_keypass", 	-- Parameter val Pass phrase source for the client's private TLS key (and TLS cert)
+		"-tls_extra", 		-- Parameter val Extra certificates to provide to TLS server during TLS handshake
+		"-tls_trusted", 	-- Parameter val Trusted certificates to use for verifying the TLS server certificate; this implies host name validation
+		"-tls_host", 		-- Parameter val Address to be checked (rather than -server) during TLS host name validation
+		"-repeat", 			-- Parameter +int Invoke the transaction the given positive number of times. Default 1
+		"-port", 			-- Parameter val Act as HTTP mock server listening on given port
+		"-max_msgs", 		-- Parameter nonneg max number of messages handled by HTTP mock server. Default: 0 = unlimited
+		"-srv_ref", 		-- Parameter val Reference value to use as senderKID of server in case no -srv_cert is given
+		"-srv_secret", 		-- Parameter val Password source for server authentication with a pre-shared key (secret)
+		"-srv_cert", 		-- Parameter val Certificate of the server
+		"-srv_key", 		-- Parameter val Private key used by the server for signing messages
+		"-srv_keypass", 	-- Parameter val Server private key (and cert) pass phrase source
+		"-srv_trusted", 	-- Parameter val Trusted certificates for client authentication
+		"-srv_untrusted", 	-- Parameter val Intermediate certs that may be useful for verifying CMP protection
+		"-rsp_cert", 		-- Parameter val Certificate to be returned as mock enrollment result
+		"-rsp_extracerts", 	-- Parameter val Extra certificates to be included in mock certification responses
+		"-rsp_capubs", 		-- Parameter val CA certificates to be included in mock ip response
+		"-poll_count", 		-- Parameter nonneg Number of times the client must poll before receiving a certificate
+		"-check_after", 	-- Parameter nonneg The check_after value (time to wait) to include in poll response
+		"-failurebits", 	-- Parameter nonneg Number representing failure bits to include in server response, 0..2^27 - 1
+		"-statusstring", 	-- Parameter val Status string to be included in server response
+		"-policy", 			-- Parameter val adds policy to the acceptable policy set
+		"-purpose", 		-- Parameter val certificate chain purpose
+		"-verify_name", 	-- Parameter val verification policy name
+		"-verify_depth", 	-- Parameter int chain depth limit
+		"-auth_level", 		-- Parameter int chain authentication security level
+		"-attime", 			-- Parameter intmax verification epoch time
+		"-verify_hostname", -- Parameter val expected peer hostname
+		"-verify_email", 	-- Parameter val expected peer email
+		"-verify_ip", 		-- Parameter val expected peer IP address
+		"-digest" .. parser(digests), 			-- Parameter val Digest to use in message protection and POPO signatures. Default "sha256"
+		"-certform" .. parser({"PEM", "DER"}), 	-- Parameter val Format (PEM or DER) to use when saving a certificate to a file. Default PEM
+		"-keyform" .. parser({"ENGINE"}), 		-- Parameter val Format of the key input (ENGINE, other values ignored)
+		"-pkistatus" .. parser({"0", "1", "2", "3", "4", "5", "6"}), -- Parameter nonneg PKIStatus to be included in server response. Possible values: 0..6
+		"-failure" .. parser({"0", "1", "2", "3", "4", "5", "6", "7", 
+							 "8", "9", "10", "11", "12", "13", "14", 
+							 "15", "16", "17", "18", "19", "20", "21", 
+							 "22", "23", "24", "25", "26"}), -- Parameter nonneg A single failure info bit number to include in server response, 0..26
+		"-keep_alive" .. parser({"0", "1", "2"}), 			-- Parameter nonneg Persistent HTTP connections. 0: no, 1 (the default): request, 2: require		
+		"-verbosity" .. parser({"3", "4", "6", "7", "8"}),	-- Parameter nonneg Log level; 3=ERR, 4=WARN, 6=INFO, 7=DEBUG, 8=TRACE. Default 6 = INFO
+		"-revreason" .. parser({"-1", "0", "1", "2", "3", "4", "5", "6", "8", "9", "10"}),	-- Parameter int Reason code to include in revocation request (rr); possible values: 0..6, 8..10 (see RFC5280, 5.3.1) or -1. Default -1 = none included
+		"-extracertsout" .. parser({clink.filematches}), 	-- Parameter val File to save extra certificates received in the extraCerts field
+		"-cacertsout" .. parser({clink.filematches}), 		-- Parameter val File to save CA certificates received in the caPubs field of 'ip' messages
+		"-rand" .. parser({clink.filematches}), 			-- Parameter val Load the given file(s) into the random number generator
+		"-writerand" .. parser({clink.filematches}), 		-- Parameter outfile Write random data to the specified file
+		"-reqin" .. parser({clink.filematches}), 			-- Parameter val Take sequence of CMP requests from file(s)
+		"-reqout" .. parser({clink.filematches}), 			-- Parameter val Save sequence of CMP requests to file(s)
+		"-rspin" .. parser({clink.filematches}), 			-- Parameter val Process sequence of CMP responses provided in file(s), skipping server
+		"-rspout" .. parser({clink.filematches}), 			-- Parameter val Save sequence of CMP responses to file(s)		
+		"-csr" .. parser({clink.filematches}), 				-- Parameter val PKCS#10 CSR file in PEM or DER format to convert or to use in p10cr
+		"-certout" .. parser({clink.filematches}), 			-- Parameter val File to save newly enrolled certificate
+		"-chainout" .. parser({clink.filematches}), 		-- Parameter val File to save the chain of newly enrolled certificate
+		"-config" .. parser({clink.filematches}),			-- Parameter val Configuration file to use. "" = none. Default from env variable OPENSSL_CONF
+		"-provider-path" .. parser({clink.dirmatches}) 		-- Parameter val Provider load path (must be before 'provider' argument if required)
+	),	
+	"fipsinstall" .. parser({}, -- empty {}: don't suggest any positional args
+		"-help", "-verify", "-no_conditional_errors", "-no_security_checks", 
+		"-self_test_onload", "-noout", "-quiet", 
+		"-provider_name", 	-- Parameter val FIPS provider name
+		"-section_name", 	-- Parameter val FIPS Provider config section name (optional)
+		"-mac_name", 		-- Parameter val MAC name
+		"-macopt", 			-- Parameter val MAC algorithm parameters in n:v form. See 'PARAMETER NAMES' in the EVP_MAC_ docs
+		"-corrupt_desc", 	-- Parameter val Corrupt a self test by description
+		"-corrupt_type", 	-- Parameter val Corrupt a self test by type
+		"-module" .. parser({clink.filematches}),		-- Parameter infile File name of the provider module
+		"-in" .. parser({clink.filematches}), 			-- Parameter infile Input config file, used when verifying
+		"-out" .. parser({clink.filematches}), 			-- Parameter outfile Output config file, used when generating
+		"-config" .. parser({clink.filematches})		-- Parameter infile The parent config to verify		
+	),
+	"info" .. parser({}, -- empty {}: don't suggest any positional args
+		"-help", "-dsoext", "-dirnamesep", "-listsep", "-seeds", "-cpusettings",  
+ 		"-configdir" .. parser({clink.dirmatches}), 	-- Default configuration file directory
+ 		"-enginesdir" .. parser({clink.dirmatches}), 	-- Default engine module directory
+ 		"-modulesdir"  .. parser({clink.dirmatches}) 	-- Default module directory (other than engine modules)
+	),
+	"kdf" .. parser(
+		"-help", "-binary", 
+		"-kdfopt", 		-- Parameter val KDF algorithm control parameters in n:v form
+		"-cipher", 		-- Parameter val Cipher
+		"-mac", 		-- Parameter val MAC
+		"-keylen", 		-- Parameter val The size of the output derived key
+		"-provider", 	-- Parameter val Provider to load (can be specified multiple times)
+		"-propquery", 	-- Parameter val Property query used when fetching algorithms	),
+		"-digest" .. parser(digests), 			-- Parameter val Digest
+		"-out" .. parser({clink.filematches}), 	-- Parameter outfile Output to filename rather than stdout
+		"-provider-path" .. parser({clink.dirmatches}) -- Parameter val Provider load path (must be before 'provider' argument if required)
+	),
+	"mac" .. parser(
+		"-help", "-binary", 
+		"-macopt", 		-- Parameter val MAC algorithm parameters in n:v form
+		"-cipher", 		-- Parameter val Cipher
+		"-provider", 	-- Parameter val Provider to load (can be specified multiple times)
+		"-propquery", 	-- Parameter val Property query used when fetching algorithms
+		"-digest" .. parser(digests), 					-- Parameter val Digest
+		"-in" .. parser({clink.filematches}), 			-- Parameter infile Input file to MAC (default is stdin)
+		"-out" .. parser({clink.filematches}), 			-- Parameter outfile Output to filename rather than stdout
+		"-provider-path" .. parser({clink.dirmatches}) 	-- Parameter val Provider load path (must be before 'provider' argument if required)
+	)
+}
+
+local openssl_parser
+
+if getOpenSSLVersion() == "1.1" then
+	openssl_parser = parser({openSSL10CommandLine})
+end
+
+if getOpenSSLVersion() == "3.0" then
+	openssl_parser = parser({openSSL10CommandLine, openSSL30CommandLine})
+end
 
 clink.arg.register_parser("openssl", openssl_parser)
-
