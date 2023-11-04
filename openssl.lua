@@ -5,7 +5,7 @@ This is a definition file for command completion in Clink.
 
 Are there any requirements?
 - "modern CLink" (version 1.2 or later)
-- OpenSSL 1.1.* or 3.0.* 
+- OpenSSL 1.1.*, 3.0.* or 3.1.*
 
 How to use this file?
 - Run 'clink info'
@@ -17,7 +17,7 @@ Where do I get the latest version?
 https://github.com/dodmi/Clink-Addons/tree/master/
 
 When was this file updated?
-2021-09-10
+2023-11-04
 
 ]]--
 
@@ -1202,6 +1202,10 @@ if getOpenSSLVersion() == "1.1" then
 end
 
 if getOpenSSLVersion() == "3.0" then
+	openssl_parser = parser({openSSL10CommandLine, openSSL30CommandLine})
+end
+
+if getOpenSSLVersion() == "3.1" then
 	openssl_parser = parser({openSSL10CommandLine, openSSL30CommandLine})
 end
 
