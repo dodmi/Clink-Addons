@@ -5,7 +5,7 @@ This is a definition file for command completion in Clink.
 
 Are there any requirements?
 - "modern CLink" (version 1.2 or later)
-- OpenSSL 1.1.*, 3.0.* or 3.1.*
+- OpenSSL 1.1.*, 3.0.* or 3.1.* - 3.4.*
 
 How to use this file?
 - Run 'clink info'
@@ -17,7 +17,7 @@ Where do I get the latest version?
 https://github.com/dodmi/Clink-Addons/tree/master/
 
 When was this file updated?
-2023-11-04
+2024-11-02
 
 ]]--
 
@@ -43,7 +43,7 @@ local function getOpenSSLVersion()
 	local tmp
     for _, line in ipairs(fileContent) do
         tmp = line:match('^OpenSSL%s+(%d+%.%d+)%..*$')
-		if tmp then 
+		if tmp then
 			version = tmp
 			break
 		end
@@ -53,11 +53,11 @@ end
 
 local parser = clink.arg.new_parser
 
-local digests = { 
-	"BLAKE2b512", "BLAKE2s256", "MD4", "MD5", "MD5-SHA1", "MDC2", 
-	"RIPEMD160", "RSA-SHA1", "SHA1", "SHA224", "SHA256", "SHA3-224", 
-	"SHA3-256", "SHA3-384", "SHA3-512", "SHA384", "SHA512", 
-	"SHA512-224", "SHA512-256", "SHAKE128", "SHAKE256", "SM3", "whirlpool" 
+local digests = {
+	"BLAKE2b512", "BLAKE2s256", "MD4", "MD5", "MD5-SHA1", "MDC2",
+	"RIPEMD160", "RSA-SHA1", "SHA1", "SHA224", "SHA256", "SHA3-224",
+	"SHA3-256", "SHA3-384", "SHA3-512", "SHA384", "SHA512",
+	"SHA512-224", "SHA512-256", "SHAKE128", "SHAKE256", "SM3", "whirlpool"
 }
 
 local openSSL10CommandLine = {
@@ -821,7 +821,7 @@ local openSSL10CommandLine = {
 		"-engine",			-- Parameter Use engine, possibly a hardware device
 		"-inform" .. parser({"SMIME", "PEM", "DER"}),
 		"-keyform" .. parser({"PEM", "DER", "ENGINE"}),
-		"-md" .. parser(digests),		
+		"-md" .. parser(digests),
 		"-outform" .. parser({"SMIME", "PEM", "DER"}),
 		"-certfile" .. parser({clink.filematches}), 	-- Parameter Other certificates file
 		"-signer" .. parser({clink.filematches}), 	-- Parameter Signer certificate file
@@ -970,11 +970,11 @@ local openSSL10CommandLine = {
 		parser({clink.filematches}),
 		"-help", "-verbose", "-no-CAfile", "-no-CApath", "-crl_download",
 		"-show_chain", "-ignore_critical", "-issuer_checks", "-crl_check",
-		"-crl_check_all", "-policy_check", "-explicit_policy", "-inhibit_any",  
-		"-inhibit_map", "-x509_strict", "-extended_crl", "-use_deltas", 
+		"-crl_check_all", "-policy_check", "-explicit_policy", "-inhibit_any",
+		"-inhibit_map", "-x509_strict", "-extended_crl", "-use_deltas",
 		"-policy_print", "-check_ss_sig", "-trusted_first", "-suiteB_128_only",
-		"-suiteB_128", "-suiteB_192", "-partial_chain", "-no_alt_chains", 
-		"-no_check_time", "-allow_proxy_certs", 
+		"-suiteB_128", "-suiteB_192", "-partial_chain", "-no_alt_chains",
+		"-no_check_time", "-allow_proxy_certs",
 		"-nameopt",			-- Parameter Various certificate name options
 		"-policy",			-- Parameter adds policy to the acceptable policy set
 		"-verify_depth",	-- Parameter chain depth limit
@@ -985,9 +985,9 @@ local openSSL10CommandLine = {
 		"-verify_ip",		-- Parameter expected peer IP address
 		"-engine",			-- Parameter Use engine, possibly a hardware device
 		"-purpose" .. parser({
-			"sslclient", "sslserver", "nssslserver", "smimesign", 
-			"smimeencrypt", "crlsign", "any", "ocsphelper", 
-			"timestampsign" 
+			"sslclient", "sslserver", "nssslserver", "smimesign",
+			"smimeencrypt", "crlsign", "any", "ocsphelper",
+			"timestampsign"
 		}),
 		"-verify_name" .. parser({ "default", "pkcs7", "smime_sign", "ssl_client", "ssl_server" }),
 		"-CAfile" .. parser({clink.filematches}), 	-- Parameter A file of trusted certificates
@@ -1043,17 +1043,17 @@ local openSSL10CommandLine = {
 
 local openSSL30CommandLine = {
 	"cmp" .. parser({}, -- empty {}: don't suggest any positional args
-		"-help", "-san_nodefault", "-policy_oids_critical", 
-		"-implicit_confirm", "-disable_confirm", "-ignore_keyusage", 
+		"-help", "-san_nodefault", "-policy_oids_critical",
+		"-implicit_confirm", "-disable_confirm", "-ignore_keyusage",
 		"-unprotected_errors", "-unprotected_requests", "-tls_used", "-batch",
-		"-reqin_new_tid", "-use_mock_srv", "-grant_implicitconf", "-send_error", 
-		"-send_unprotected", "-send_unprot_err", "-accept_unprotected", 
-		"-accept_unprot_err", "-accept_raverified", "-ignore_critical", 
-		"-issuer_checks", "-crl_check", "-crl_check_all", "-policy_check", 
-		"-explicit_policy", "-inhibit_any", "-inhibit_map", "-x509_strict", 
-		"-extended_crl", "-use_deltas", "-policy_print", "-check_ss_sig", 
-		"-trusted_first", "-suiteB_128_only", "-suiteB_128", "-suiteB_192", 
-		"-partial_chain", "-no_alt_chains", "-no_check_time", "-allow_proxy_certs", 
+		"-reqin_new_tid", "-use_mock_srv", "-grant_implicitconf", "-send_error",
+		"-send_unprotected", "-send_unprot_err", "-accept_unprotected",
+		"-accept_unprot_err", "-accept_raverified", "-ignore_critical",
+		"-issuer_checks", "-crl_check", "-crl_check_all", "-policy_check",
+		"-explicit_policy", "-inhibit_any", "-inhibit_map", "-x509_strict",
+		"-extended_crl", "-use_deltas", "-policy_print", "-check_ss_sig",
+		"-trusted_first", "-suiteB_128_only", "-suiteB_128", "-suiteB_192",
+		"-partial_chain", "-no_alt_chains", "-no_check_time", "-allow_proxy_certs",
 		"-section", 	-- Parameter val Section(s) in config file to get options from. "" = 'default'. Default 'cmp'
 		"-cmd", 		-- Parameter val CMP request to send: ir/cr/kur/p10cr/rr/genm
 		"-infotype", 	-- Parameter val InfoType name for requesting specific info in genm, e.g. 'signKeyPairTypes'
@@ -1129,11 +1129,11 @@ local openSSL30CommandLine = {
 		"-certform" .. parser({"PEM", "DER"}), 	-- Parameter val Format (PEM or DER) to use when saving a certificate to a file. Default PEM
 		"-keyform" .. parser({"ENGINE"}), 		-- Parameter val Format of the key input (ENGINE, other values ignored)
 		"-pkistatus" .. parser({"0", "1", "2", "3", "4", "5", "6"}), -- Parameter nonneg PKIStatus to be included in server response. Possible values: 0..6
-		"-failure" .. parser({"0", "1", "2", "3", "4", "5", "6", "7", 
-							 "8", "9", "10", "11", "12", "13", "14", 
-							 "15", "16", "17", "18", "19", "20", "21", 
+		"-failure" .. parser({"0", "1", "2", "3", "4", "5", "6", "7",
+							 "8", "9", "10", "11", "12", "13", "14",
+							 "15", "16", "17", "18", "19", "20", "21",
 							 "22", "23", "24", "25", "26"}), -- Parameter nonneg A single failure info bit number to include in server response, 0..26
-		"-keep_alive" .. parser({"0", "1", "2"}), 			-- Parameter nonneg Persistent HTTP connections. 0: no, 1 (the default): request, 2: require		
+		"-keep_alive" .. parser({"0", "1", "2"}), 			-- Parameter nonneg Persistent HTTP connections. 0: no, 1 (the default): request, 2: require
 		"-verbosity" .. parser({"3", "4", "6", "7", "8"}),	-- Parameter nonneg Log level; 3=ERR, 4=WARN, 6=INFO, 7=DEBUG, 8=TRACE. Default 6 = INFO
 		"-revreason" .. parser({"-1", "0", "1", "2", "3", "4", "5", "6", "8", "9", "10"}),	-- Parameter int Reason code to include in revocation request (rr); possible values: 0..6, 8..10 (see RFC5280, 5.3.1) or -1. Default -1 = none included
 		"-extracertsout" .. parser({clink.filematches}), 	-- Parameter val File to save extra certificates received in the extraCerts field
@@ -1143,16 +1143,16 @@ local openSSL30CommandLine = {
 		"-reqin" .. parser({clink.filematches}), 			-- Parameter val Take sequence of CMP requests from file(s)
 		"-reqout" .. parser({clink.filematches}), 			-- Parameter val Save sequence of CMP requests to file(s)
 		"-rspin" .. parser({clink.filematches}), 			-- Parameter val Process sequence of CMP responses provided in file(s), skipping server
-		"-rspout" .. parser({clink.filematches}), 			-- Parameter val Save sequence of CMP responses to file(s)		
+		"-rspout" .. parser({clink.filematches}), 			-- Parameter val Save sequence of CMP responses to file(s)
 		"-csr" .. parser({clink.filematches}), 				-- Parameter val PKCS#10 CSR file in PEM or DER format to convert or to use in p10cr
 		"-certout" .. parser({clink.filematches}), 			-- Parameter val File to save newly enrolled certificate
 		"-chainout" .. parser({clink.filematches}), 		-- Parameter val File to save the chain of newly enrolled certificate
 		"-config" .. parser({clink.filematches}),			-- Parameter val Configuration file to use. "" = none. Default from env variable OPENSSL_CONF
 		"-provider-path" .. parser({clink.dirmatches}) 		-- Parameter val Provider load path (must be before 'provider' argument if required)
-	),	
+	),
 	"fipsinstall" .. parser({}, -- empty {}: don't suggest any positional args
-		"-help", "-verify", "-no_conditional_errors", "-no_security_checks", 
-		"-self_test_onload", "-noout", "-quiet", 
+		"-help", "-verify", "-no_conditional_errors", "-no_security_checks",
+		"-self_test_onload", "-noout", "-quiet",
 		"-provider_name", 	-- Parameter val FIPS provider name
 		"-section_name", 	-- Parameter val FIPS Provider config section name (optional)
 		"-mac_name", 		-- Parameter val MAC name
@@ -1162,16 +1162,16 @@ local openSSL30CommandLine = {
 		"-module" .. parser({clink.filematches}),		-- Parameter infile File name of the provider module
 		"-in" .. parser({clink.filematches}), 			-- Parameter infile Input config file, used when verifying
 		"-out" .. parser({clink.filematches}), 			-- Parameter outfile Output config file, used when generating
-		"-config" .. parser({clink.filematches})		-- Parameter infile The parent config to verify		
+		"-config" .. parser({clink.filematches})		-- Parameter infile The parent config to verify
 	),
 	"info" .. parser({}, -- empty {}: don't suggest any positional args
-		"-help", "-dsoext", "-dirnamesep", "-listsep", "-seeds", "-cpusettings",  
+		"-help", "-dsoext", "-dirnamesep", "-listsep", "-seeds", "-cpusettings",
  		"-configdir" .. parser({clink.dirmatches}), 	-- Default configuration file directory
  		"-enginesdir" .. parser({clink.dirmatches}), 	-- Default engine module directory
  		"-modulesdir"  .. parser({clink.dirmatches}) 	-- Default module directory (other than engine modules)
 	),
 	"kdf" .. parser(
-		"-help", "-binary", 
+		"-help", "-binary",
 		"-kdfopt", 		-- Parameter val KDF algorithm control parameters in n:v form
 		"-cipher", 		-- Parameter val Cipher
 		"-mac", 		-- Parameter val MAC
@@ -1183,7 +1183,7 @@ local openSSL30CommandLine = {
 		"-provider-path" .. parser({clink.dirmatches}) -- Parameter val Provider load path (must be before 'provider' argument if required)
 	),
 	"mac" .. parser(
-		"-help", "-binary", 
+		"-help", "-binary",
 		"-macopt", 		-- Parameter val MAC algorithm parameters in n:v form
 		"-cipher", 		-- Parameter val Cipher
 		"-provider", 	-- Parameter val Provider to load (can be specified multiple times)
@@ -1206,6 +1206,18 @@ if getOpenSSLVersion() == "3.0" then
 end
 
 if getOpenSSLVersion() == "3.1" then
+	openssl_parser = parser({openSSL10CommandLine, openSSL30CommandLine})
+end
+
+if getOpenSSLVersion() == "3.2" then
+	openssl_parser = parser({openSSL10CommandLine, openSSL30CommandLine})
+end
+
+if getOpenSSLVersion() == "3.3" then
+	openssl_parser = parser({openSSL10CommandLine, openSSL30CommandLine})
+end
+
+if getOpenSSLVersion() == "3.4" then
 	openssl_parser = parser({openSSL10CommandLine, openSSL30CommandLine})
 end
 
