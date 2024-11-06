@@ -13,7 +13,7 @@ Where do I get the latest version?
 https://github.com/dodmi/Clink-Addons/tree/master/
 
 When was this file updated?
-2021-03-06
+2024-11-05
 
 ]]--
 
@@ -33,8 +33,8 @@ end
 
 -- read all host entries in the user's ssh config file,
 -- omit definitions containing wildcards (?, *), are subnets (/) or excluded (!)
-local function listConfigHosts()
-    local fileContent = readFile(clink.get_env("userprofile") .. "/.ssh/config")
+local function listConfigHosts(configFile)
+    local fileContent = readFile(configFile)
     local configHosts = {}
     local hostsLine, host
     for _, line in ipairs(fileContent) do
@@ -50,8 +50,8 @@ end
 
 -- read all host entries in the known_hosts file
 -- if more entries for the same host are contained, only the first will be taken
-local function listKnownHosts()
-    local fileContent = readFile(clink.get_env("userprofile") .. "/.ssh/known_hosts")
+local function listKnownHosts(hostFile)
+    local fileContent = readFile(hostFile)
     local knownHosts = {}
     local host
     for _, line in ipairs(fileContent) do
@@ -65,8 +65,25 @@ end
 
 -- return the complete host list
 local function hosts (token)
-    local allHosts = listConfigHosts()
-    for _, host in ipairs(listKnownHosts()) do
+    local allHosts = {}
+
+    for _, host in ipairs(listConfigHosts(clink.get_env("userprofile") .. "/.ssh/config")) do
+        table.insert(allHosts, host)
+    end
+    for _, host in ipairs(listConfigHosts(clink.get_env("allusersprofile") .. "/ssh/ssh_config")) do
+        table.insert(allHosts, host)
+    end
+
+    for _, host in ipairs(listKnownHosts(clink.get_env("userprofile") .. "/.ssh/known_hosts")) do
+        table.insert(allHosts, host)
+    end
+    for _, host in ipairs(listKnownHosts(clink.get_env("userprofile") .. "/.ssh/known_hosts2")) do
+        table.insert(allHosts, host)
+    end
+    for _, host in ipairs(listKnownHosts(clink.get_env("allusersprofile") .. "/ssh/ssh_known_hosts")) do
+        table.insert(allHosts, host)
+    end
+    for _, host in ipairs(listKnownHosts(clink.get_env("allusersprofile") .. "/ssh/ssh_known_hosts2")) do
         table.insert(allHosts, host)
     end
     return allHosts
@@ -121,8 +138,8 @@ local ssh_parser = parser(
     parser({hosts}),
     "-4", "-6", "-A", "-a", "-C", "-f", "-G", "-g", "-K", "-k",
     "-M", "-N", "-n", "-q", "-s", "-T", "-t", "-V", "-v", "-X",
-    "-x", "-Y", "-y", "-I", "-L", "-l", "-m", "-O", "-o", "-p",
-    "-R", "-w", "-B", "-c", "-D", "-e", "-S",
+    "-x", "-Y", "-y", "-I", "-L", "-l", "-m", "-O", "-o", "-P",
+    "-p", "-R", "-w", "-B", "-c", "-D", "-e", "-S",
     "-Q" .. parser({"cipher", "cipher_auth", "help", "mac", "kex", "kex-gss", "key", "key-cert", "key-plain", "key-sig", "protocol-version", "sig"}),
     "-J" .. parser({hosts}),
     "-W" .. parser({hosts}),
