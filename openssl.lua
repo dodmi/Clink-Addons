@@ -5,7 +5,7 @@ This is a definition file for command completion in Clink.
 
 Are there any requirements?
 - "modern CLink" (version 1.2 or later)
-- OpenSSL 1.1.*, 3.0.* or 3.1.* - 3.4.*
+- OpenSSL 1.1.*, 3.0.*, 3.1.* - 3.4.* or 3.5
 
 How to use this file?
 - Run 'clink info'
@@ -17,7 +17,7 @@ Where do I get the latest version?
 https://github.com/dodmi/Clink-Addons/tree/master/
 
 When was this file updated?
-2024-11-02
+2025-04-21
 
 ]]--
 
@@ -54,11 +54,52 @@ end
 local parser = clink.arg.new_parser
 
 local digests = {
-	"BLAKE2b512", "BLAKE2s256", "MD4", "MD5", "MD5-SHA1", "MDC2",
-	"RIPEMD160", "RSA-SHA1", "SHA1", "SHA224", "SHA256", "SHA3-224",
-	"SHA3-256", "SHA3-384", "SHA3-512", "SHA384", "SHA512",
-	"SHA512-224", "SHA512-256", "SHAKE128", "SHAKE256", "SM3", "whirlpool"
+	"BLAKE2B512", "BLAKE2S256", "MD5", "RMD160", "SHA1", "SHA224",
+	"SHA256", "SHA3-224", "SHA3-256", "SHA3-384", "SHA3-512", "SHA384",
+	"SHA512", "SHA512-224", "SHA512-256", "SHAKE128", "SHAKE256", "SM3"
 }
+
+if getOpenSSLVersion() == "1.1" then
+	digests = {
+		"BLAKE2B512", "BLAKE2S256", "MD4", "MD5", "MD5-SHA1", "MDC2",
+		"RIPEMD160", "RSA-SHA1", "SHA1", "SHA224", "SHA256", "SHA3-224",
+		"SHA3-256", "SHA3-384", "SHA3-512", "SHA384", "SHA512",
+		"SHA512-224", "SHA512-256", "SHAKE128", "SHAKE256", "SM3", "WHIRLPOOL"
+	}
+end
+
+local ciphers = {
+	"AES-128-CBC", "AES-128-ECB", "AES-192-CBC", "AES-192-ECB", "AES-256-CBC",
+	"AES-256-ECB", "ARIA-128-CBC", "ARIA-128-CFB", "ARIA-128-CFB1",
+	"ARIA-128-CFB8", "ARIA-128-CTR", "ARIA-128-ECB", "ARIA-128-OFB",
+	"ARIA-192-CBC", "ARIA-192-CFB", "ARIA-192-CFB1", "ARIA-192-CFB8",
+	"ARIA-192-CTR", "ARIA-192-ECB", "ARIA-192-OFB", "ARIA-256-CBC",
+	"ARIA-256-CFB", "ARIA-256-CFB1", "ARIA-256-CFB8", "ARIA-256-CTR",
+	"ARIA-256-ECB", "ARIA-256-OFB", "CAMELLIA-128-CBC", "CAMELLIA-128-ECB",
+	"CAMELLIA-192-CBC", "CAMELLIA-192-ECB", "CAMELLIA-256-CBC", "CAMELLIA-256-ECB",
+	"DES-EDE", "DES-EDE-CBC", "DES-EDE-CFB", "DES-EDE-OFB", "DES-EDE3", "DES-EDE3-CBC",
+	"DES-EDE3-CFB", "DES-EDE3-OFB", "DES3", "SM4-CBC", "SM4-CFB", "SM4-CTR", "SM4-ECB",
+	"SM4-OFB"
+}
+
+if getOpenSSLVersion() == "1.1" then
+	ciphers = {
+		"AES-128-CBC", "AES-128-ECB", "AES-192-CBC", "AES-192-ECB", "AES-256-CBC",
+		"AES-256-ECB", "ARIA-128-CBC", "ARIA-128-CFB", "ARIA-128-CFB1", "ARIA-128-CFB8",
+		"ARIA-128-CTR", "ARIA-128-ECB", "ARIA-128-OFB", "ARIA-192-CBC", "ARIA-192-CFB",
+		"ARIA-192-CFB1", "ARIA-192-CFB8", "ARIA-192-CTR", "ARIA-192-ECB", "ARIA-192-OFB",
+		"ARIA-256-CBC", "ARIA-256-CFB", "ARIA-256-CFB1", "ARIA-256-CFB8", "ARIA-256-CTR",
+		"ARIA-256-ECB", "ARIA-256-OFB", "BASE64", "BF", "BF-CBC", "BF-CFB", "BF-ECB",
+		"BF-OFB", "CAMELLIA-128-CBC", "CAMELLIA-128-ECB", "CAMELLIA-192-CBC",
+		"CAMELLIA-192-ECB", "CAMELLIA-256-CBC", "CAMELLIA-256-ECB", "CAST", "CAST-CBC",
+		"CAST5-CBC", "CAST5-CFB", "CAST5-ECB", "CAST5-OFB", "DES", "DES-CBC", "DES-CFB",
+		"DES-ECB", "DES-EDE", "DES-EDE-CBC", "DES-EDE-CFB", "DES-EDE-OFB", "DES-EDE3",
+		"DES-EDE3-CBC", "DES-EDE3-CFB", "DES-EDE3-OFB", "DES-OFB", "DES3", "DESX", "RC2",
+		"RC2-40-CBC", "RC2-64-CBC", "RC2-CBC", "RC2-CFB", "RC2-ECB", "RC2-OFB", "RC4",
+		"RC4-40", "SEED", "SEED-CBC", "SEED-CFB", "SEED-ECB", "SEED-OFB", "SM4-CBC",
+		"SM4-CFB", "SM4-CTR", "SM4-ECB", "SM4-OFB"
+	}
+end
 
 local openSSL10CommandLine = {
     "asn1parse" .. parser({}, -- empty {}: don't suggest any positional args
@@ -1173,7 +1214,7 @@ local openSSL30CommandLine = {
 	"kdf" .. parser(
 		"-help", "-binary",
 		"-kdfopt", 		-- Parameter val KDF algorithm control parameters in n:v form
-		"-cipher", 		-- Parameter val Cipher
+		"-cipher" .. parser(ciphers), 		-- Parameter val Cipher
 		"-mac", 		-- Parameter val MAC
 		"-keylen", 		-- Parameter val The size of the output derived key
 		"-provider", 	-- Parameter val Provider to load (can be specified multiple times)
@@ -1185,13 +1226,26 @@ local openSSL30CommandLine = {
 	"mac" .. parser(
 		"-help", "-binary",
 		"-macopt", 		-- Parameter val MAC algorithm parameters in n:v form
-		"-cipher", 		-- Parameter val Cipher
+		"-cipher" .. parser(ciphers), 		-- Parameter val Cipher
 		"-provider", 	-- Parameter val Provider to load (can be specified multiple times)
 		"-propquery", 	-- Parameter val Property query used when fetching algorithms
 		"-digest" .. parser(digests), 					-- Parameter val Digest
 		"-in" .. parser({clink.filematches}), 			-- Parameter infile Input file to MAC (default is stdin)
 		"-out" .. parser({clink.filematches}), 			-- Parameter outfile Output to filename rather than stdout
 		"-provider-path" .. parser({clink.dirmatches}) 	-- Parameter val Provider load path (must be before 'provider' argument if required)
+	)
+}
+
+local openSSL35CommandLine = {
+	"skeyutl" .. parser(
+		"-help", "-gen-key",
+		"-skeyopt",		-- Parameter val Key options as opt:value for opaque keys handling
+		"-skeymgmt", 	-- Parameter val Symmetric key management name for opaque keys handling
+		"-cipher" .. parser(ciphers), 		-- Parameter val The cipher to generate key for
+		"-provider", 	-- Parameter val Provider to load (can be specified multiple times)
+		"-provparam", 	-- Parameter val Set a provider key-value parameter
+		"-propquery", 	-- Parameter val Property query used when fetching algorithms
+		"-provider-path" .. parser({clink.dirmatches}) 		-- Parameter val Provider load path (must be before 'provider' argument if required)
 	)
 }
 
@@ -1219,6 +1273,10 @@ end
 
 if getOpenSSLVersion() == "3.4" then
 	openssl_parser = parser({openSSL10CommandLine, openSSL30CommandLine})
+end
+
+if getOpenSSLVersion() == "3.5" then
+	openssl_parser = parser({openSSL10CommandLine, openSSL30CommandLine, openSSL35CommandLine})
 end
 
 clink.arg.register_parser("openssl", openssl_parser)
