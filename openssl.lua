@@ -5,7 +5,7 @@ This is a definition file for command completion in Clink.
 
 Are there any requirements?
 - "modern CLink" (version 1.2 or later)
-- OpenSSL 1.1.*, 3.0.*, 3.1.* - 3.6
+- OpenSSL 1.1.*, 3.0.*, 3.1.* - 3.6, 4.0
 
 How to use this file?
 - Run 'clink info'
@@ -17,7 +17,7 @@ Where do I get the latest version?
 https://github.com/dodmi/Clink-Addons/tree/master/
 
 When was this file updated?
-2025-10-23
+2026-04-18
 
 ]]--
 
@@ -100,6 +100,14 @@ if getOpenSSLVersion() == "1.1" then
 		"SM4-CFB", "SM4-CTR", "SM4-ECB", "SM4-OFB"
 	}
 end
+
+local openSSLEngineCommandLine = {
+		"engine" .. parser({}, -- empty {}: don't suggest any positional args
+		"-help", "-v", "-vv", "-vvv", "-vvvv", "-c", "-t", "-tt",
+		"-pre",		-- Parameter Run command against the ENGINE before loading it
+		"-post"	-- Parameter Run command against the ENGINE after loading it
+	)
+}
 
 local openSSL10CommandLine = {
     "asn1parse" .. parser({}, -- empty {}: don't suggest any positional args
@@ -337,11 +345,6 @@ local openSSL10CommandLine = {
 		"-kfile" .. parser({clink.filematches}), 		-- Parameter Read passphrase from file
 		"-rand" .. parser({clink.filematches}), 		-- Parameter Load the file(s) into the random number generator
 		"-writerand" .. parser({clink.filematches}) 	-- Parameter Write random data to the specified file
-	),
-	"engine" .. parser({}, -- empty {}: don't suggest any positional args
-		"-help", "-v", "-vv", "-vvv", "-vvvv", "-c", "-t", "-tt",
-		"-pre",		-- Parameter Run command against the ENGINE before loading it
-		"-post"	-- Parameter Run command against the ENGINE after loading it
 	),
 	"errstr" .. parser({}, -- empty {}: don't suggest any positional args
 		"-help"
@@ -1249,7 +1252,7 @@ local openSSL35CommandLine = {
 	)
 }
 
-local openSSL35CommandLine = {
+local openSSL36CommandLine = {
 	"configutl" .. parser(
 		"-help",
 		"-config" .. parser({clink.filematches}),			-- Config file to deal with (the default one if omitted)
@@ -1258,38 +1261,57 @@ local openSSL35CommandLine = {
 	)
 }
 
+local openSSL40CommandLine = {
+	"ech" .. parser(
+		"-help",
+		"-max_name_len",									-- Maximum host name length value [default: 0]
+		"-public_name",										-- public_name value
+		"-suite",											-- HPKE ciphersuite: e.g. "0x20,1,3"
+		"-verbose",											-- Provide additional output
+		"-ech_version",										-- ECHConfig version [default: 0xff0d (13)]
+		"-in" .. parser({clink.filematches}),				-- An ECH PEM file
+		"-out" .. parser({clink.filematches}),				-- Private key and/or ECHConfig [default: echconfig.pem]
+		"-select",											-- Downselect to the numbered ECH config
+		"-text"												-- Provide human-readable output
+	)
+}
+
 local openssl_parser
 
 if getOpenSSLVersion() == "1.1" then
-	openssl_parser = parser({openSSL10CommandLine})
+	openssl_parser = parser({openSSLEngineCommandLine, openSSL10CommandLine})
 end
 
 if getOpenSSLVersion() == "3.0" then
-	openssl_parser = parser({openSSL10CommandLine, openSSL30CommandLine})
+	openssl_parser = parser({openSSLEngineCommandLine, openSSL10CommandLine, openSSL30CommandLine})
 end
 
 if getOpenSSLVersion() == "3.1" then
-	openssl_parser = parser({openSSL10CommandLine, openSSL30CommandLine})
+	openssl_parser = parser({openSSLEngineCommandLine, openSSL10CommandLine, openSSL30CommandLine})
 end
 
 if getOpenSSLVersion() == "3.2" then
-	openssl_parser = parser({openSSL10CommandLine, openSSL30CommandLine})
+	openssl_parser = parser({openSSLEngineCommandLine, openSSL10CommandLine, openSSL30CommandLine})
 end
 
 if getOpenSSLVersion() == "3.3" then
-	openssl_parser = parser({openSSL10CommandLine, openSSL30CommandLine})
+	openssl_parser = parser({openSSLEngineCommandLine, openSSL10CommandLine, openSSL30CommandLine})
 end
 
 if getOpenSSLVersion() == "3.4" then
-	openssl_parser = parser({openSSL10CommandLine, openSSL30CommandLine})
+	openssl_parser = parser({openSSLEngineCommandLine, openSSL10CommandLine, openSSL30CommandLine})
 end
 
 if getOpenSSLVersion() == "3.5" then
-	openssl_parser = parser({openSSL10CommandLine, openSSL30CommandLine, openSSL35CommandLine})
+	openssl_parser = parser({openSSLEngineCommandLine, openSSL10CommandLine, openSSL30CommandLine, openSSL35CommandLine})
 end
 
 if getOpenSSLVersion() == "3.6" then
-	openssl_parser = parser({openSSL10CommandLine, openSSL30CommandLine, openSSL35CommandLine, openSSL36CommandLine})
+	openssl_parser = parser({openSSLEngineCommandLine, openSSL10CommandLine, openSSL30CommandLine, openSSL35CommandLine, openSSL36CommandLine})
+end
+
+if getOpenSSLVersion() == "4.0" then
+	openssl_parser = parser({openSSL10CommandLine, openSSL30CommandLine, openSSL35CommandLine, openSSL36CommandLine, openSSL40CommandLine})
 end
 
 clink.arg.register_parser("openssl", openssl_parser)
