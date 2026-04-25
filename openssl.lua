@@ -17,7 +17,7 @@ Where do I get the latest version?
 https://github.com/dodmi/Clink-Addons/tree/master/
 
 When was this file updated?
-2026-04-18
+2026-04-25
 
 ]]--
 
@@ -101,11 +101,35 @@ if getOpenSSLVersion() == "1.1" then
 	}
 end
 
-local openSSLEngineCommandLine = {
-		"engine" .. parser({}, -- empty {}: don't suggest any positional args
+local openSSL1OnlyCommandLine = {
+	"dhparam" .. parser(
+		"-C"
+	),
+	"dsaparam" .. parser(
+		"-C"
+	),
+	"ecparam" .. parser(
+		"-C"
+	),
+	"passwd" .. parser(
+		"-crypt"
+	),
+	"rsautl" .. parser(
+		"-ssl"
+	),
+	"x509" .. parser(
+		"-C"
+	),
+}
+
+local openSSL1to3CommandLine = {
+	"engine" .. parser({}, -- empty {}: don't suggest any positional args
 		"-help", "-v", "-vv", "-vvv", "-vvvv", "-c", "-t", "-tt",
 		"-pre",		-- Parameter Run command against the ENGINE before loading it
 		"-post"	-- Parameter Run command against the ENGINE after loading it
+	),
+	"ca" .. parser(
+		"-msie-hack"
 	)
 }
 
@@ -127,7 +151,7 @@ local openSSL10CommandLine = {
 	"ca" .. parser({}, -- empty {}: don't suggest any positional args
 		"-help", "-verbose", "-utf8", "-create_serial", "-rand_serial",
 		"-multivalue-rdn", "-selfsign", "-notext", "-batch", "-preserveDN",
-		"-noemailDN", "-gencrl", "-msie_hack", "-infiles", "-updatedb",
+		"-noemailDN", "-gencrl", "-infiles", "-updatedb",
 		"-name", 				-- Parameter The particular CA definition to use
 		"-subj", 				-- Parameter Use arg instead of request's subject
 		"-startdate", 			-- Parameter Cert notBefore, YYMMDDHHMMSSZ
@@ -271,7 +295,7 @@ local openSSL10CommandLine = {
 		"-prverify" .. parser({clink.filematches}) 	-- Parameter Verify a signature using private key
 	),
 	"dhparam" .. parser({}, -- empty {}: don't suggest any positional args
-		"-help", "-check", "-text", "-noout", "-C", "-2", "-5", "-dsaparam",
+		"-help", "-check", "-text", "-noout", "-2", "-5", "-dsaparam",
 		"-engine",		-- Parameter Use engine e, possibly a hardware device
 		"-inform" .. parser({"PEM", "DER"}),
  		"-outform" .. parser({"PEM", "DER"}),
@@ -292,7 +316,7 @@ local openSSL10CommandLine = {
 		"-out" .. parser({clink.filematches}) 		-- Parameter Output file
 	),
 	"dsaparam" .. parser({}, -- empty {}: don't suggest any positional args
-		"-help", "-text", "-C", "-noout", "-genkey",
+		"-help", "-text", "-noout", "-genkey",
 		"-engine",		-- Parameter Use engine e, possibly a hardware device
 		"-inform" .. parser({"PEM", "DER"}),
  		"-outform" .. parser({"PEM", "DER"}),
@@ -315,7 +339,7 @@ local openSSL10CommandLine = {
 		"-out" .. parser({clink.filematches}) 		-- Parameter Output file
 	),
 	"ecparam" .. parser({}, -- empty {}: don't suggest any positional args
-		"-help", "-text", "-C", "-check", "-list_curves",
+		"-help", "-text", "-check", "-list_curves",
 		"-no_seed", "-noout", "-genkey",
 		"-name",		-- Parameter Use the ec parameters with specified 'short name'
 		"-conv_form",	-- Parameter Specifies the point conversion form
@@ -444,7 +468,7 @@ local openSSL10CommandLine = {
 		"-CApath" .. parser({clink.dirmatches}) 		-- Parameter Trusted certificates directory
 	),
 	"passwd" .. parser({}, -- empty {}: don't suggest any positional args
-		"-help", "-noverify", "-quiet", "-table", "-reverse", "-stdin", "-6", "-5", "-apr1", "-1", "-aixmd5", "-crypt",
+		"-help", "-noverify", "-quiet", "-table", "-reverse", "-stdin", "-6", "-5", "-apr1", "-1", "-aixmd5",
 		"-salt",	-- Parameter Use provided salt
 		"-in" .. parser({clink.filematches}), 			-- Parameter Read passwords from file
 		"-rand" .. parser({clink.filematches}), 			-- Parameter Load the file(s) into the random number generator
@@ -592,7 +616,7 @@ local openSSL10CommandLine = {
 		"-out" .. parser({clink.filematches}) 	-- Parameter Output file
 	),
 	"rsautl" .. parser({}, -- empty {}: don't suggest any positional args
-		"-help", "-pubin", "-certin", "-ssl", "-raw", "-pkcs", "-oaep",
+		"-help", "-pubin", "-certin", "-raw", "-pkcs", "-oaep",
 		"-sign", "-verify", "-asn1parse", "-hexdump", "-x931", "-rev",
 		"-encrypt", "-decrypt",
 		"-passin",	-- Parameter Input file pass phrase source
@@ -1049,7 +1073,7 @@ local openSSL10CommandLine = {
 		"-purpose", "-dates", "-modulus", "-pubkey", "-fingerprint",
 		"-alias", "-noout", "-nocert", "-ocspid", "-ocsp_uri", "-trustout",
 		"-clrtrust", "-clrext", "-x509toreq", "-req", "-CAcreateserial",
-		"-text", "-C", "-next_serial", "-clrreject", "-badsig", "-*",
+		"-text", "-next_serial", "-clrreject", "-badsig", "-*",
 		"-subject_hash_old", "-issuer_hash_old", "-preserve_dates",
 		"-passin",		-- Parameter Private key password/pass-phrase source
 		"-addtrust",	-- Parameter Trust certificate for a given purpose
@@ -1086,6 +1110,10 @@ local openSSL10CommandLine = {
 }
 
 local openSSL30CommandLine = {
+	"ca" .. parser(
+		"-crl_lastupdate",
+		"-crl_nextupdate"
+	),
 	"cmp" .. parser({}, -- empty {}: don't suggest any positional args
 		"-help", "-san_nodefault", "-policy_oids_critical",
 		"-implicit_confirm", "-disable_confirm", "-ignore_keyusage",
@@ -1226,6 +1254,10 @@ local openSSL30CommandLine = {
 		"-out" .. parser({clink.filematches}), 	-- Parameter outfile Output to filename rather than stdout
 		"-provider-path" .. parser({clink.dirmatches}) -- Parameter val Provider load path (must be before 'provider' argument if required)
 	),
+	"list" .. parser(
+		"-providers",
+		"-objects"
+	),
 	"mac" .. parser(
 		"-help", "-binary",
 		"-macopt", 		-- Parameter val MAC algorithm parameters in n:v form
@@ -1236,6 +1268,73 @@ local openSSL30CommandLine = {
 		"-in" .. parser({clink.filematches}), 			-- Parameter infile Input file to MAC (default is stdin)
 		"-out" .. parser({clink.filematches}), 			-- Parameter outfile Output to filename rather than stdout
 		"-provider-path" .. parser({clink.dirmatches}) 	-- Parameter val Provider load path (must be before 'provider' argument if required)
+	),
+	"req" .. parser(
+		"-copy_extensions"
+	),
+	"s_client" .. parser(
+		"-client_renegotiation"
+	),
+	"x509" .. parser(
+		"-copy_extensions"
+	)
+}
+
+local openSSL31CommandLine = {
+	"fipsinstall" .. parser(
+		"-no_drbg_truncated_digests"
+	)
+}
+
+
+local openSSL32CommandLine = {
+	"s_client" .. parser(
+		"-quic",
+		"-adv",
+		"-ktls"
+	),
+	"s_server" .. parser(
+		"-ktls"
+	),
+	"cmp" .. parser(
+		"-srvcertout",
+		"-serial"
+	),
+	"cms" .. parser(
+		"-digest"
+	)
+}
+
+local openSSL33CommandLine = {
+	"x509" .. parser(
+		"-set_issuer",
+		"-set_subject"
+	),
+	"cmp" .. parser(
+		"-profile"
+	)
+}
+
+local openSSL34CommandLine = {
+	"req" .. parser(
+		"-not_before",
+		"-not_after"
+	),
+	"x509" .. parser(
+		"-not_before",
+		"-not_after"
+	),
+	"ca" .. parser(
+		"-not_before",
+		"-not_after"
+	),
+	"cmp" .. parser(
+		"-template",
+		"-crlcert",
+		"-oldcrl",
+		"-crlout",
+		"-crlform",
+		"-rsp_crl"
 	)
 }
 
@@ -1249,6 +1348,9 @@ local openSSL35CommandLine = {
 		"-provparam", 	-- Parameter val Set a provider key-value parameter
 		"-propquery", 	-- Parameter val Property query used when fetching algorithms
 		"-provider-path" .. parser({clink.dirmatches}) 		-- Parameter val Provider load path (must be before 'provider' argument if required)
+	),
+	"cms" .. parser(
+		"-no_signing_time"
 	)
 }
 
@@ -1258,6 +1360,13 @@ local openSSL36CommandLine = {
 		"-config" .. parser({clink.filematches}),			-- Config file to deal with (the default one if omitted)
 		"-out" .. parser({clink.filematches}),				-- Output to filename rather than stdout
 		"-noheader"											-- Don't print the information about original config
+	),
+	"s_client" .. parser(
+		"-ocsp_check_leaf",
+		"-ocsp_check_all"
+	),
+	"s_server" .. parser(
+		"-status_all"
 	)
 }
 
@@ -1273,45 +1382,65 @@ local openSSL40CommandLine = {
 		"-out" .. parser({clink.filematches}),				-- Private key and/or ECHConfig [default: echconfig.pem]
 		"-select",											-- Downselect to the numbered ECH config
 		"-text"												-- Provide human-readable output
+	),
+	"s_client" .. parser(
+		"-expected-rpks"
+	),
+	"s_server" .. parser(
+		"-expected-rpks"
+	),
+	"dgst" .. parser(
+		"-hmac-env",
+		"-hmac-stdin"
+	),
+	"enc" .. parser(
+		"-skeyuri",
+		"-storepass"
+	),
+	"storeutl" .. parser(
+		"-skeys"
+	),
+	"fipsinstall" .. parser(
+		"-defer_tests"
 	)
 }
 
 local openssl_parser
 
 if getOpenSSLVersion() == "1.1" then
-	openssl_parser = parser({openSSLEngineCommandLine, openSSL10CommandLine})
+	openssl_parser = parser({openSSL10CommandLine, openSSL1OnlyCommandLine, openSSL1to3CommandLine})
 end
 
 if getOpenSSLVersion() == "3.0" then
-	openssl_parser = parser({openSSLEngineCommandLine, openSSL10CommandLine, openSSL30CommandLine})
+	openssl_parser = parser({openSSL10CommandLine, openSSL30CommandLine, openSSL1to3CommandLine})
 end
 
 if getOpenSSLVersion() == "3.1" then
-	openssl_parser = parser({openSSLEngineCommandLine, openSSL10CommandLine, openSSL30CommandLine})
+	openssl_parser = parser({openSSL10CommandLine, openSSL30CommandLine, openSSL1to3CommandLine, openSSL31CommandLine})
 end
 
 if getOpenSSLVersion() == "3.2" then
-	openssl_parser = parser({openSSLEngineCommandLine, openSSL10CommandLine, openSSL30CommandLine})
+	openssl_parser = parser({openSSL10CommandLine, openSSL30CommandLine, openSSL1to3CommandLine, openSSL31CommandLine, openSSL32CommandLine})
 end
 
 if getOpenSSLVersion() == "3.3" then
-	openssl_parser = parser({openSSLEngineCommandLine, openSSL10CommandLine, openSSL30CommandLine})
+	openssl_parser = parser({openSSL10CommandLine, openSSL30CommandLine, openSSL1to3CommandLine, openSSL31CommandLine, openSSL32CommandLine, openSSL33CommandLine})
 end
 
 if getOpenSSLVersion() == "3.4" then
-	openssl_parser = parser({openSSLEngineCommandLine, openSSL10CommandLine, openSSL30CommandLine})
+	openssl_parser = parser({openSSL10CommandLine, openSSL30CommandLine, openSSL1to3CommandLine, openSSL31CommandLine, openSSL32CommandLine, openSSL33CommandLine, openSSL34CommandLine})
 end
 
 if getOpenSSLVersion() == "3.5" then
-	openssl_parser = parser({openSSLEngineCommandLine, openSSL10CommandLine, openSSL30CommandLine, openSSL35CommandLine})
+	openssl_parser = parser({openSSL10CommandLine, openSSL30CommandLine, openSSL1to3CommandLine, openSSL31CommandLine, openSSL32CommandLine, openSSL33CommandLine, openSSL34CommandLine, openSSL35CommandLine})
 end
 
 if getOpenSSLVersion() == "3.6" then
-	openssl_parser = parser({openSSLEngineCommandLine, openSSL10CommandLine, openSSL30CommandLine, openSSL35CommandLine, openSSL36CommandLine})
+	openssl_parser = parser({openSSL10CommandLine, openSSL30CommandLine, openSSL1to3CommandLine, openSSL31CommandLine, openSSL32CommandLine, openSSL33CommandLine, openSSL34CommandLine, openSSL35CommandLine, openSSL36CommandLine})
 end
 
 if getOpenSSLVersion() == "4.0" then
-	openssl_parser = parser({openSSL10CommandLine, openSSL30CommandLine, openSSL35CommandLine, openSSL36CommandLine, openSSL40CommandLine})
+	openssl_parser = parser({openSSL10CommandLine, openSSL30CommandLine, openSSL31CommandLine, openSSL32CommandLine, openSSL33CommandLine, openSSL34CommandLine, openSSL35CommandLine, openSSL36CommandLine, openSSL40CommandLine})
 end
 
 clink.arg.register_parser("openssl", openssl_parser)
